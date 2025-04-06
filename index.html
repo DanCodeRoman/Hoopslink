@@ -1,0 +1,3283 @@
+html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HoopsLink - Find Your Game</title>
+    <!-- Include Supabase JS Library (v2) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        /* --- Global Styles & Variables --- */
+        :root {
+            --primary-color: #FF6B00; /* Energetic Orange */
+            --secondary-color: #4A00E0; /* Vibrant Purple */
+            --accent-color: #00F2A9; /* Electric Teal */
+            --background-color: #121212; /* Dark Background */
+            --surface-color: #1E1E1E; /* Slightly Lighter Surface */
+            --text-color: #E0E0E0; /* Light Text */
+            --text-color-dark: #111111; /* Dark Text for light backgrounds */
+            --success-color: #00D18B;
+            --error-color: #FF4D4D;
+            --font-family: 'Poppins', sans-serif; /* Playful but clean font */
+            --border-radius: 12px;
+            --box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            --transition-speed: 0.3s;
+            --transition-effect: ease-in-out;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            font-family: var(--font-family);
+            background-color: var(--background-color);
+            color: var(--text-color);
+            overflow: hidden; /* Prevent scrolling on body, manage scrolling in sections */
+            font-size: 16px;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #app-container {
+            width: 100%;
+            height: 100%;
+            max-width: 450px; /* Mobile-first approach */
+            background: linear-gradient(135deg, #1a1a1a 0%, #111 100%);
+            border-radius: 0; /* Full screen on mobile */
+            box-shadow: var(--box-shadow);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        @media (min-width: 451px) {
+             #app-container {
+                max-width: 400px; /* Slightly constrain on larger viewports */
+                max-height: 850px;
+                border-radius: var(--border-radius);
+                margin: 20px;
+             }
+             body {
+                background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+             }
+        }
+
+
+        /* --- Screen Management --- */
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--background-color);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity var(--transition-speed) var(--transition-effect), transform var(--transition-speed) var(--transition-effect);
+            transform: translateX(100%);
+            display: flex;
+            flex-direction: column;
+            z-index: 1;
+        }
+
+        .screen.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(0);
+            z-index: 10;
+        }
+
+        /* Specific screen transitions */
+        #auth-screen.active { transform: translateX(0); }
+        #loading-screen.active { transform: scale(1); opacity: 1; z-index: 100; }
+        #main-app-screen.active { transform: translateX(0); }
+        #game-detail-screen.active { transform: translateX(0); }
+        #active-game-screen.active { transform: scale(1); opacity: 1; } /* Zoom in effect */
+        #game-end-screen.active { transform: translateY(0); opacity: 1; } /* Slide up effect */
+        #profile-screen.active { transform: translateX(0); }
+        #leaderboard-screen.active { transform: translateX(0); }
+
+        #loading-screen {
+            transform: scale(1.1); /* Start slightly bigger for scale down */
+            transition: opacity var(--transition-speed) ease-out, transform var(--transition-speed) ease-out;
+            background: linear-gradient(180deg, var(--primary-color), var(--secondary-color));
+            justify-content: center;
+            align-items: center;
+            z-index: 100; /* Always on top when active */
+        }
+
+        #game-end-screen {
+             transform: translateY(100%);
+        }
+
+        /* --- Utility Classes --- */
+        .hidden { display: none !important; }
+        .text-center { text-align: center; }
+        .bold { font-weight: bold; }
+        .primary-text { color: var(--primary-color); }
+        .secondary-text { color: var(--secondary-color); }
+        .accent-text { color: var(--accent-color); }
+        .error-text { color: var(--error-color); font-size: 0.9em; margin-top: 5px;}
+        .success-text { color: var(--success-color); }
+        .flex-col { display: flex; flex-direction: column; }
+        .flex-row { display: flex; flex-direction: row; }
+        .flex-center { display: flex; justify-content: center; align-items: center; }
+        .flex-grow { flex-grow: 1; }
+        .space-between { justify-content: space-between; }
+        .align-center { align-items: center; }
+        .p-1 { padding: 1rem; }
+        .p-2 { padding: 2rem; }
+        .m-1 { margin: 1rem; }
+        .mt-1 { margin-top: 1rem; }
+        .mb-1 { margin-bottom: 1rem; }
+        .ml-1 { margin-left: 1rem; }
+        .mr-1 { margin-right: 1rem; }
+        .gap-1 { gap: 1rem; }
+        .gap-05 { gap: 0.5rem; }
+
+        /* --- Basic Elements Styling --- */
+        button, input[type="submit"] {
+            padding: 12px 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: transform var(--transition-speed) var(--transition-effect), background-color var(--transition-speed) var(--transition-effect), box-shadow var(--transition-speed) var(--transition-effect);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        button::before, input[type="submit"]::before { /* Ripple effect base */
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.5s ease-out, height 0.5s ease-out;
+            z-index: -1;
+        }
+
+        button:active::before, input[type="submit"]:active::before {
+             width: 300px; /* Large enough to cover button */
+             height: 300px;
+        }
+
+
+        button:hover, input[type="submit"]:hover {
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        button:active, input[type="submit"]:active {
+             transform: translateY(0) scale(1);
+             box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--primary-color), #FFA040);
+            color: var(--text-color-dark);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, var(--secondary-color), #8A2BE2);
+            color: var(--text-color);
+        }
+         .btn-accent {
+            background: linear-gradient(45deg, var(--accent-color), #00C896);
+            color: var(--text-color-dark);
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, var(--error-color), #FF6F6F);
+            color: var(--text-color);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+         .btn-outline:hover {
+            background-color: var(--primary-color);
+            color: var(--text-color-dark);
+         }
+
+        input[type="text"], input[type="email"], input[type="password"], input[type="datetime-local"], textarea {
+            width: 100%;
+            padding: 12px 15px;
+            background-color: var(--surface-color);
+            border: 1px solid transparent;
+            border-radius: var(--border-radius);
+            color: var(--text-color);
+            font-size: 1rem;
+            transition: border-color var(--transition-speed) var(--transition-effect), box-shadow var(--transition-speed);
+        }
+
+        input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus, input[type="datetime-local"]:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.3);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: var(--accent-color);
+        }
+
+        h1, h2, h3 {
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+        }
+        h1 { font-size: 2.5rem; line-height: 1.1; background: linear-gradient(45deg, var(--primary-color), var(--accent-color)); -webkit-background-clip: text; color: transparent; font-weight: 900; }
+        h2 { font-size: 1.8rem; color: var(--primary-color); }
+        h3 { font-size: 1.4rem; color: var(--secondary-color); }
+
+        hr {
+            border: none;
+            height: 1px;
+            background-color: var(--surface-color);
+            margin: 1rem 0;
+        }
+
+        /* --- Header / Navbar --- */
+        .app-header {
+            padding: 1rem;
+            background-color: var(--surface-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            z-index: 50; /* Above content, below active screens */
+            position: sticky;
+            top: 0;
+        }
+
+        .app-header .logo {
+            font-size: 1.5rem;
+            font-weight: 900;
+            background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            color: transparent;
+            cursor: pointer;
+            animation: pulse-logo 5s infinite ease-in-out;
+        }
+
+        @keyframes pulse-logo {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .header-actions button {
+            background: none;
+            border: none;
+            color: var(--accent-color);
+            font-size: 1.5rem;
+            cursor: pointer;
+            margin-left: 1rem;
+            padding: 5px;
+            transition: color var(--transition-speed), transform var(--transition-speed);
+        }
+        .header-actions button:hover {
+            color: var(--primary-color);
+            transform: scale(1.1);
+        }
+
+        /* --- Content Area --- */
+        .content-area {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            /* Custom scrollbar */
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-color) var(--surface-color);
+        }
+        .content-area::-webkit-scrollbar {
+            width: 8px;
+        }
+        .content-area::-webkit-scrollbar-track {
+            background: var(--surface-color);
+            border-radius: 10px;
+        }
+        .content-area::-webkit-scrollbar-thumb {
+            background-color: var(--primary-color);
+            border-radius: 10px;
+            border: 2px solid var(--surface-color);
+        }
+
+        /* --- Loading Spinner --- */
+        .loader {
+            border: 6px solid var(--surface-color); /* Light grey */
+            border-top: 6px solid var(--primary-color); /* Blue */
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin: 2rem auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* --- Specific Screen Styles --- */
+
+        /* Auth Screen */
+        #auth-screen {
+            background: linear-gradient(180deg, var(--secondary-color) 0%, var(--background-color) 70%);
+            justify-content: center;
+            align-items: center;
+             padding: 2rem;
+        }
+        #auth-form-container {
+            background-color: rgba(30, 30, 30, 0.8);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            width: 100%;
+            max-width: 350px;
+            backdrop-filter: blur(5px);
+        }
+        #auth-form-container h2 {
+             color: var(--accent-color);
+             text-align: center;
+             margin-bottom: 1.5rem;
+        }
+        .auth-toggle {
+             margin-top: 1rem;
+             text-align: center;
+        }
+         .auth-toggle button {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            text-decoration: underline;
+            font-size: 0.9rem;
+            cursor: pointer;
+         }
+
+        /* Main App Screen (Game List) */
+        #main-app-screen .content-area { padding: 0; /* List items have padding */ }
+        #game-list {
+            list-style: none;
+            padding: 0;
+        }
+        .game-list-item {
+            background-color: var(--surface-color);
+            margin: 1rem;
+            padding: 1rem 1.5rem;
+            border-radius: var(--border-radius);
+            border-left: 5px solid var(--primary-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: transform var(--transition-speed), box-shadow var(--transition-speed), border-color var(--transition-speed);
+            animation: slideInUp 0.5s var(--transition-effect) backwards;
+            opacity: 0; /* Start hidden for animation */
+        }
+         /* Staggered animation */
+        @for $i from 1 through 20 {
+            .game-list-item:nth-child(#{$i}) {
+                animation-delay: #{$i * 0.05}s;
+            }
+        }
+
+        @keyframes slideInUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+
+        .game-list-item:hover {
+            transform: translateX(5px) scale(1.02);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            border-left-color: var(--accent-color);
+        }
+        .game-info h3 { margin-bottom: 0.3rem; color: var(--text-color); font-size: 1.2rem;}
+        .game-meta { font-size: 0.9rem; color: #aaa; }
+        .game-status-indicator {
+             padding: 5px 10px;
+             border-radius: 20px;
+             font-size: 0.8rem;
+             font-weight: bold;
+             text-transform: uppercase;
+        }
+        .status-pending { background-color: var(--primary-color); color: var(--text-color-dark); }
+        .status-active { background-color: var(--success-color); color: var(--text-color-dark); }
+        .status-finished { background-color: var(--secondary-color); color: var(--text-color); }
+
+
+        #create-game-fab {
+            position: absolute;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+            color: var(--text-color-dark);
+            font-size: 2rem;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+            z-index: 20;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Bouncy effect */
+        }
+        #create-game-fab:hover {
+            transform: scale(1.1) rotate(90deg);
+        }
+
+        /* Create Game Modal */
+        #create-game-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity var(--transition-speed) ease, visibility var(--transition-speed) ease;
+            backdrop-filter: blur(5px);
+        }
+        #create-game-modal.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        #create-game-form-container {
+            background-color: var(--surface-color);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            width: 90%;
+            max-width: 400px;
+            transform: scale(0.9);
+            transition: transform var(--transition-speed) cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+         #create-game-modal.visible #create-game-form-container {
+            transform: scale(1);
+         }
+
+        /* Game Detail / Lobby Screen */
+        #game-detail-screen .content-area, #active-game-screen .content-area {
+             padding: 1.5rem;
+        }
+        #game-detail-header h2 {
+             background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+             -webkit-background-clip: text;
+             color: transparent;
+             margin-bottom: 0.5rem;
+        }
+        #game-detail-meta span { margin-right: 1rem; color: #ccc; font-size: 0.9rem; }
+        #player-list { list-style: none; padding: 0; }
+        .player-list-item {
+            background-color: var(--surface-color);
+            padding: 10px 15px;
+            border-radius: var(--border-radius);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: fadeIn 0.5s ease forwards;
+            opacity: 0;
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .player-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--secondary-color); /* Placeholder */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            color: var(--text-color);
+        }
+        .player-username { font-weight: 600; }
+        .player-status { margin-left: auto; font-size: 0.8rem; color: #aaa; } /* e.g., 'Creator' */
+
+        #game-actions button { width: 100%; margin-top: 10px; }
+
+        /* Active Game Screen */
+        #active-game-screen {
+            background: linear-gradient(180deg, #222 0%, var(--background-color) 80%);
+        }
+        .scoreboard {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background-color: rgba(0,0,0,0.3);
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 1.5rem;
+        }
+        .team-score { text-align: center; }
+        .team-name { font-size: 1rem; font-weight: 600; margin-bottom: 5px; color: #aaa; }
+        .score {
+            font-size: 3rem;
+            font-weight: 900;
+            line-height: 1;
+            transition: transform 0.3s ease, color 0.3s ease;
+            cursor: pointer; /* Indicate clickable for scoring */
+        }
+        .score:hover { transform: scale(1.1); }
+        #team-a-score { color: var(--primary-color); }
+        #team-b-score { color: var(--accent-color); }
+        .vs { font-size: 1.5rem; font-weight: bold; color: var(--text-color); }
+
+        .team-display { display: flex; gap: 1rem; margin-top: 1rem;}
+        .team-column {
+             flex: 1;
+             background-color: var(--surface-color);
+             padding: 1rem;
+             border-radius: var(--border-radius);
+        }
+         .team-column h4 { margin-bottom: 1rem; text-align: center; }
+         #team-a-list h4 { color: var(--primary-color); }
+         #team-b-list h4 { color: var(--accent-color); }
+
+        .team-player {
+            font-size: 0.9rem;
+            padding: 5px 0;
+            border-bottom: 1px solid #333;
+        }
+         .team-player:last-child { border-bottom: none; }
+
+         #score-confirmation-modal {
+            position: fixed;
+            bottom: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--surface-color);
+            padding: 1rem 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            z-index: 1001;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
+            transform: translate(-50%, 20px); /* Start below */
+         }
+         #score-confirmation-modal.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%);
+         }
+         #score-confirmation-modal button {
+            padding: 8px 15px;
+            font-size: 0.9rem;
+         }
+
+        /* Game End Screen */
+        #game-end-screen {
+            background: linear-gradient(180deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+            position: relative; /* For confetti */
+            overflow: hidden;
+        }
+        #game-end-summary {
+            background-color: rgba(30, 30, 30, 0.8);
+            padding: 2.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            backdrop-filter: blur(5px);
+            animation: zoomIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            opacity: 0; /* Start hidden */
+        }
+        @keyframes zoomIn {
+            from { transform: scale(0.5); opacity: 0;}
+            to { transform: scale(1); opacity: 1;}
+        }
+
+        #game-end-summary h2 { color: var(--accent-color); font-size: 2.5rem; }
+        #final-score { font-size: 1.8rem; margin-bottom: 1.5rem; }
+        #mvp-highlight {
+            background-color: rgba(0,0,0,0.3);
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 1.5rem;
+            border: 2px solid var(--accent-color);
+        }
+        #mvp-highlight h3 { color: var(--accent-color); margin-bottom: 0.5rem; font-size: 1.2rem; }
+        #mvp-username { font-size: 1.5rem; font-weight: bold; color: var(--primary-color); }
+        #mvp-score { font-size: 1rem; color: #ccc; }
+        #game-end-actions button { margin: 0.5rem; }
+
+        /* Confetti */
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 20px;
+            background-color: var(--primary-color);
+            opacity: 0.7;
+            animation: confetti-fall 4s linear infinite;
+        }
+        @keyframes confetti-fall {
+            0% { transform: translateY(-100px) rotateZ(0deg); opacity: 0.7; }
+            100% { transform: translateY(100vh) rotateZ(720deg); opacity: 0; }
+        }
+
+        /* Profile Screen */
+        #profile-screen .content-area { padding: 2rem; }
+        #profile-header { text-align: center; margin-bottom: 2rem; }
+        #profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            margin: 0 auto 1rem auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 4rem;
+            font-weight: bold;
+            color: var(--text-color);
+            box-shadow: 0 0 20px rgba(255, 107, 0, 0.5);
+        }
+        #profile-username { font-size: 1.8rem; font-weight: bold; }
+        #edit-profile-username-input { display: none; margin-top: 5px; }
+        #edit-profile-btn, #save-profile-btn {
+            background: none; border: none; color: var(--accent-color); cursor: pointer; font-size: 0.9rem; margin-left: 10px;
+        }
+        #profile-stats {
+            background-color: var(--surface-color);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            margin-top: 1.5rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 1rem;
+        }
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 1.5rem; font-weight: bold; color: var(--primary-color); }
+        .stat-label { font-size: 0.9rem; color: #aaa; }
+
+        /* Game History */
+         #game-history-list { margin-top: 1.5rem; list-style: none; padding: 0; }
+         .history-item {
+             background-color: var(--surface-color);
+             padding: 1rem;
+             border-radius: var(--border-radius);
+             margin-bottom: 1rem;
+             border-left: 4px solid var(--secondary-color);
+         }
+         .history-details { font-size: 0.9em; color: #ccc; margin-bottom: 5px; }
+         .history-score { font-weight: bold; }
+         .history-result { font-weight: bold; }
+         .result-win { color: var(--success-color); }
+         .result-loss { color: var(--error-color); }
+
+
+        /* Leaderboard Screen */
+        #leaderboard-list { list-style: none; padding: 0; }
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            margin: 0 1rem 1rem 1rem;
+            background-color: var(--surface-color);
+            border-radius: var(--border-radius);
+            position: relative;
+             transition: transform 0.2s ease-in-out;
+             animation: fadeIn 0.5s ease forwards; /* Reuse fadeIn */
+             opacity: 0;
+        }
+        .leaderboard-item:hover {
+             transform: scale(1.03);
+        }
+
+        /* Staggered animation for leaderboard */
+        @for $i from 1 through 50 {
+            .leaderboard-item:nth-child(#{$i}) {
+                animation-delay: #{$i * 0.05}s;
+            }
+        }
+
+        .leaderboard-rank {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            width: 40px;
+            text-align: center;
+            margin-right: 1rem;
+        }
+        /* Top 3 styling */
+        .leaderboard-item:nth-child(1) .leaderboard-rank { color: #FFD700; font-size: 1.6rem; } /* Gold */
+        .leaderboard-item:nth-child(2) .leaderboard-rank { color: #C0C0C0; font-size: 1.4rem; } /* Silver */
+        .leaderboard-item:nth-child(3) .leaderboard-rank { color: #CD7F32; font-size: 1.3rem; } /* Bronze */
+
+        .leaderboard-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background-color: var(--secondary-color); /* Placeholder */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            color: var(--text-color);
+            margin-right: 1rem;
+        }
+        .leaderboard-info { flex-grow: 1; }
+        .leaderboard-username { font-weight: 600; }
+        .leaderboard-stat { font-size: 0.9rem; color: #aaa; }
+        .leaderboard-score {
+             font-size: 1.1rem;
+             font-weight: bold;
+             color: var(--accent-color);
+        }
+
+        /* Chat */
+        #chat-drawer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 70%;
+            max-height: 500px;
+            background-color: var(--surface-color);
+            border-top-left-radius: var(--border-radius);
+            border-top-right-radius: var(--border-radius);
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
+            transform: translateY(100%);
+            transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            z-index: 900;
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+        }
+        #chat-drawer.open {
+            transform: translateY(0);
+        }
+        #chat-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid #444;}
+        #chat-header h3 { margin-bottom: 0; color: var(--accent-color); }
+        #close-chat-btn { background: none; border: none; color: var(--text-color); font-size: 1.5rem; cursor: pointer; }
+
+        #chat-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            margin-bottom: 1rem;
+            /* Custom scrollbar */
+            scrollbar-width: thin;
+            scrollbar-color: var(--secondary-color) var(--background-color);
+        }
+        #chat-messages::-webkit-scrollbar { width: 6px; }
+        #chat-messages::-webkit-scrollbar-track { background: var(--background-color); border-radius: 10px; }
+        #chat-messages::-webkit-scrollbar-thumb { background-color: var(--secondary-color); border-radius: 10px; }
+
+        .chat-message {
+            margin-bottom: 0.8rem;
+            display: flex;
+            flex-direction: column;
+            max-width: 80%;
+            animation: popIn 0.3s ease forwards;
+            opacity: 0; /* Start hidden */
+        }
+        @keyframes popIn { from { transform: scale(0.8); opacity: 0;} to { transform: scale(1); opacity: 1;} }
+
+        .chat-message.own { align-self: flex-end; align-items: flex-end; }
+        .message-bubble {
+            padding: 8px 12px;
+            border-radius: var(--border-radius);
+            background-color: #333;
+            color: var(--text-color);
+            word-wrap: break-word;
+        }
+        .chat-message.own .message-bubble {
+            background: linear-gradient(45deg, var(--primary-color), #FFA040);
+            color: var(--text-color-dark);
+        }
+        .message-meta {
+            font-size: 0.75rem;
+            color: #aaa;
+            margin-top: 3px;
+        }
+        .chat-message.own .message-meta { text-align: right; }
+        .message-sender { font-weight: bold; margin-right: 5px; }
+
+        #chat-input-area { display: flex; gap: 10px; }
+        #chat-input { flex-grow: 1; background-color: #444; border: none; }
+         #chat-input:focus { box-shadow: none; border: 1px solid var(--secondary-color); }
+        #send-chat-btn { /* Use button base styles */ }
+
+        /* Modal Base */
+        .modal {
+             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+             background-color: rgba(0, 0, 0, 0.7);
+             display: flex; justify-content: center; align-items: center;
+             z-index: 1000; opacity: 0; visibility: hidden;
+             transition: opacity var(--transition-speed) ease, visibility var(--transition-speed) ease;
+             backdrop-filter: blur(5px);
+        }
+        .modal.visible { opacity: 1; visibility: visible; }
+        .modal-content {
+            background-color: var(--surface-color); padding: 2rem;
+            border-radius: var(--border-radius); box-shadow: var(--box-shadow);
+            width: 90%; max-width: 400px;
+            transform: scale(0.9);
+            transition: transform var(--transition-speed) cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative; /* For close button */
+        }
+        .modal.visible .modal-content { transform: scale(1); }
+        .modal-close-btn {
+            position: absolute; top: 10px; right: 10px;
+            background: none; border: none; color: var(--text-color);
+            font-size: 1.8rem; cursor: pointer; line-height: 1; padding: 5px;
+        }
+
+        /* Share Modal */
+        #share-options button {
+            display: block;
+            width: 100%;
+            margin-bottom: 10px;
+            text-align: left;
+            padding: 12px 15px;
+            background-color: #444;
+            color: var(--text-color);
+        }
+         #share-options button:hover {
+             background-color: #555;
+             transform: none; /* Disable button hover effect */
+             box-shadow: none;
+         }
+         #share-link-input { margin-top: 1rem; }
+
+    </style>
+</head>
+<body>
+    <div id="app-container">
+
+        <!-- Loading Screen -->
+        <div id="loading-screen" class="screen active">
+            <h1 class="logo" style="font-size: 3rem; animation: pulse-logo 2s infinite ease-in-out;">HoopsLink</h1>
+            <div class="loader mt-1"></div>
+            <p class="mt-1">Finding your court...</p>
+        </div>
+
+        <!-- Auth Screen -->
+        <div id="auth-screen" class="screen flex-col">
+            <div id="auth-form-container">
+                <h2 id="auth-title">Login to HoopsLink</h2>
+                <form id="auth-form">
+                    <div class="mb-1">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" required>
+                    </div>
+                    <div class="mb-1">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" required>
+                    </div>
+                    <div id="username-field" class="mb-1 hidden">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" minlength="3">
+                         <small style="font-size: 0.8em; color: #aaa;">Min 3 characters, used for display.</small>
+                    </div>
+                    <div id="auth-error" class="error-text mb-1"></div>
+                    <button type="submit" id="auth-submit-btn" class="btn-primary w-full">Login</button>
+                </form>
+                <div class="auth-toggle">
+                    <span id="auth-toggle-text">Don't have an account?</span>
+                    <button id="auth-toggle-btn">Sign Up</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main App Screen (Game List) -->
+        <div id="main-app-screen" class="screen flex-col">
+            <header class="app-header">
+                <div class="logo">HoopsLink</div>
+                <div class="header-actions">
+                     <button id="leaderboard-nav-btn" title="Leaderboard"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M120-120v-150h150v150H120Zm0-270v-150h150v150H120Zm0-270v-150h150v150H120Zm270 270v-150h150v150H390Zm0-270v-150h150v150H390Zm270 540v-150h150v150H660Zm0-270v-150h150v150H660Zm0-270v-150h150v150H660Zm-270 0v-150h150v150H390Z"/></svg></button> <!-- Icon Placeholder -->
+                     <button id="profile-nav-btn" title="Profile"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-160v-112q0-34 17.5-62.5T224-378q62-31 126-46.5T480-440q66 0 130 15.5T736-378q29 15 46.5 43.5T800-272v112H160Z"/></svg></button> <!-- Icon Placeholder -->
+                    <button id="logout-btn" title="Logout"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v120H200v560h280v120H200Zm440-160-55-58 102-102H360v-120h327L585-662l55-58 200 200-200 200Z"/></svg></button> <!-- Icon Placeholder -->
+                </div>
+            </header>
+            <div class="content-area">
+                <h2>Upcoming Games</h2>
+                <div id="game-list-loader" class="loader hidden"></div>
+                <ul id="game-list">
+                    <!-- Game items will be injected here by JS -->
+                    <!-- Example:
+                    <li class="game-list-item" data-game-id="123">
+                        <div class="game-info">
+                            <h3>Downtown Court Showdown</h3>
+                            <div class="game-meta">
+                                <span>📍 Downtown Courts</span> | <span>📅 Tomorrow, 6:00 PM</span>
+                            </div>
+                        </div>
+                        <div class="game-status-indicator status-pending">5/10 Players</div>
+                    </li>
+                     -->
+                </ul>
+                <p id="no-games-message" class="text-center mt-2 hidden">No games found. Why not create one?</p>
+            </div>
+            <button id="create-game-fab" title="Create Game">+</button>
+        </div>
+
+        <!-- Game Detail / Lobby Screen -->
+        <div id="game-detail-screen" class="screen flex-col">
+             <header class="app-header">
+                 <button class="back-btn" style="background:none; border:none; font-size: 1.5rem; color: var(--accent-color); cursor:pointer;">&lt;</button>
+                 <div class="logo">Game Lobby</div>
+                 <div></div><!-- Spacer -->
+            </header>
+            <div class="content-area">
+                <div id="game-detail-loader" class="loader"></div>
+                <div id="game-detail-content" class="hidden">
+                    <div id="game-detail-header">
+                        <h2 id="game-detail-location">Location Name</h2>
+                        <div id="game-detail-meta" class="mb-1">
+                             <span id="game-detail-datetime">📅 Time</span>
+                             <span id="game-detail-creator">👑 Created by User</span>
+                        </div>
+                         <div id="game-detail-status" class="mb-1 bold">Status: <span class="status-indicator">Pending</span></div>
+                    </div>
+                    <hr>
+                    <h3>Players (<span id="player-count">0</span>/<span id="max-players">10</span>)</h3>
+                    <ul id="player-list" class="mb-1">
+                       <!-- Player items injected here -->
+                       <!-- Example:
+                       <li class="player-list-item">
+                           <div class="player-avatar">U</div>
+                           <span class="player-username">CoolUser123</span>
+                           <span class="player-status">Creator</span>
+                       </li>
+                        -->
+                    </ul>
+                     <div id="game-actions">
+                         <button id="join-leave-game-btn" class="btn-primary">Join Game</button>
+                         <button id="begin-game-btn" class="btn-secondary hidden">Begin Game (Creator Only)</button>
+                         <button id="cancel-game-btn" class="btn-danger hidden">Cancel Game (Creator Only)</button>
+                         <button id="share-game-btn" class="btn-accent mt-1">Share Game</button>
+                    </div>
+                    <div id="game-detail-error" class="error-text mt-1"></div>
+                     <hr>
+                     <!-- Chat Toggle -->
+                     <button id="toggle-chat-btn" class="btn-outline w-full mt-1">Show Chat</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Game Screen -->
+        <div id="active-game-screen" class="screen flex-col">
+            <header class="app-header">
+                 <div class="logo" style="font-size: 1.2rem;">Active Game</div>
+                 <!-- Maybe add a 'Quit Game' or 'View Lobby' button here with warnings -->
+                 <button id="active-game-toggle-chat-btn" class="btn-outline" style="padding: 5px 10px; font-size: 0.9rem;">Chat</button>
+            </header>
+             <div class="content-area">
+                 <div id="active-game-loader" class="loader"></div>
+                 <div id="active-game-content" class="hidden">
+                     <div class="scoreboard">
+                         <div class="team-score">
+                             <div class="team-name">Team A</div>
+                             <div id="team-a-score" class="score" data-team="A">0</div>
+                         </div>
+                         <div class="vs">VS</div>
+                         <div class="team-score">
+                             <div class="team-name">Team B</div>
+                             <div id="team-b-score" class="score" data-team="B">0</div>
+                         </div>
+                     </div>
+
+                     <p id="score-proposal-message" class="text-center mb-1 success-text hidden"></p>
+                     <p id="score-error-message" class="text-center mb-1 error-text hidden"></p>
+
+                     <div class="team-display">
+                         <div id="team-a-list" class="team-column">
+                             <h4>Team A</h4>
+                             <!-- Team A Players Injected -->
+                         </div>
+                         <div id="team-b-list" class="team-column">
+                             <h4>Team B</h4>
+                             <!-- Team B Players Injected -->
+                         </div>
+                     </div>
+
+                     <p class="text-center mt-2" style="font-size: 0.9em; color: #aaa;">Click score to propose +1 point.</p>
+                 </div>
+             </div>
+              <!-- Score Confirmation Modal -->
+              <div id="score-confirmation-modal" class="">
+                  <p id="score-confirm-text">Confirm +1 for Team X?</p>
+                  <button id="confirm-score-btn" class="btn-success">Confirm</button>
+                  <button id="reject-score-btn" class="btn-danger">Reject</button>
+             </div>
+        </div>
+
+        <!-- Game End Screen -->
+        <div id="game-end-screen" class="screen flex-col">
+             <div id="confetti-container"></div> <!-- JS will add confetti here -->
+             <div id="game-end-summary">
+                 <h2 id="game-end-title">Game Over!</h2>
+                 <p id="final-score" class="bold">Team A: 10 - Team B: 8</p>
+                 <div id="mvp-highlight">
+                     <h3>🏆 Top Scorer (MVP) 🏆</h3>
+                     <p id="mvp-username" class="bold">MVP_User</p>
+                     <p id="mvp-score">Scored X points</p>
+                 </div>
+                 <div id="game-end-actions" class="flex-col gap-05">
+                     <button id="back-to-main-btn" class="btn-primary">Back to Games</button>
+                     <button id="view-leaderboard-btn" class="btn-secondary">View Leaderboard</button>
+                     <button id="share-results-btn" class="btn-accent">Share Results</button>
+                 </div>
+            </div>
+        </div>
+
+        <!-- Profile Screen -->
+        <div id="profile-screen" class="screen flex-col">
+             <header class="app-header">
+                 <button class="back-btn" style="background:none; border:none; font-size: 1.5rem; color: var(--accent-color); cursor:pointer;">&lt;</button>
+                 <div class="logo">Your Profile</div>
+                 <div></div><!-- Spacer -->
+            </header>
+            <div class="content-area">
+                <div id="profile-loader" class="loader"></div>
+                 <div id="profile-content" class="hidden">
+                     <div id="profile-header">
+                         <div id="profile-avatar">U</div> <!-- User Initial/Avatar -->
+                         <div>
+                             <span id="profile-username" class="bold">Username</span>
+                             <button id="edit-profile-btn">✏️</button>
+                             <button id="save-profile-btn" class="hidden">💾</button>
+                         </div>
+                         <input type="text" id="edit-profile-username-input" placeholder="New username">
+                         <div id="profile-email" style="font-size: 0.9em; color: #aaa;">user@example.com</div>
+                         <div id="profile-update-message" class="success-text mt-1"></div>
+                         <div id="profile-update-error" class="error-text mt-1"></div>
+                     </div>
+                     <div id="profile-stats">
+                         <div class="stat-item">
+                             <div id="profile-stat-points" class="stat-value">0</div>
+                             <div class="stat-label">Total Points</div>
+                         </div>
+                         <div class="stat-item">
+                             <div id="profile-stat-games" class="stat-value">0</div>
+                             <div class="stat-label">Games Played</div>
+                         </div>
+                         <div class="stat-item">
+                             <div id="profile-stat-mvp" class="stat-value">0</div>
+                             <div class="stat-label">MVP Awards</div>
+                         </div>
+                     </div>
+                    <hr>
+                    <h3>Game History</h3>
+                     <div id="game-history-loader" class="loader hidden"></div>
+                     <ul id="game-history-list">
+                         <!-- History items injected -->
+                         <!-- Example:
+                         <li class="history-item">
+                              <div class="history-details">Downtown Court Showdown - Jan 10, 2024</div>
+                              <div class="history-score">Team A: 10 - Team B: 5</div>
+                              <div class="history-result result-win">Result: Win (MVP)</div>
+                         </li>
+                          -->
+                     </ul>
+                      <p id="no-history-message" class="text-center mt-1 hidden">No completed games yet.</p>
+                 </div>
+            </div>
+        </div>
+
+         <!-- Leaderboard Screen -->
+        <div id="leaderboard-screen" class="screen flex-col">
+             <header class="app-header">
+                 <button class="back-btn" style="background:none; border:none; font-size: 1.5rem; color: var(--accent-color); cursor:pointer;">&lt;</button>
+                 <div class="logo">Global Leaderboard</div>
+                 <div></div><!-- Spacer -->
+            </header>
+            <div class="content-area" style="padding: 0;">
+                <h2 class="p-1" style="text-align: center; color: var(--primary-color);">Top Players (By Points)</h2>
+                <div id="leaderboard-loader" class="loader"></div>
+                <ul id="leaderboard-list">
+                    <!-- Leaderboard items injected -->
+                    <!-- Example:
+                    <li class="leaderboard-item">
+                        <span class="leaderboard-rank">1</span>
+                        <div class="leaderboard-avatar">K</div>
+                        <div class="leaderboard-info">
+                            <div class="leaderboard-username">KingJames</div>
+                            <div class="leaderboard-stat">🏆 5 MVP Awards</div>
+                        </div>
+                        <div class="leaderboard-score">1050 PTS</div>
+                    </li>
+                    -->
+                </ul>
+                <p id="no-leaderboard-message" class="text-center mt-2 hidden">Leaderboard is empty.</p>
+            </div>
+        </div>
+
+        <!-- Chat Drawer -->
+        <div id="chat-drawer">
+            <div id="chat-header">
+                <h3>Game Chat</h3>
+                <button id="close-chat-btn">&times;</button>
+            </div>
+            <div id="chat-messages">
+                 <!-- Chat messages injected -->
+                 <!-- Example:
+                 <div class="chat-message">
+                    <div class="message-bubble">Hey everyone! Ready to play?</div>
+                    <div class="message-meta"><span class="message-sender">UserA</span> 10:30 AM</div>
+                 </div>
+                 <div class="chat-message own">
+                    <div class="message-bubble">Yeah! Let's go! 🔥</div>
+                    <div class="message-meta">10:31 AM</div>
+                 </div>
+                  -->
+            </div>
+            <div id="chat-input-area">
+                <input type="text" id="chat-input" placeholder="Type your message...">
+                <button id="send-chat-btn" class="btn-secondary">Send</button>
+            </div>
+        </div>
+
+        <!-- Create Game Modal -->
+        <div id="create-game-modal" class="modal">
+             <div id="create-game-form-container" class="modal-content">
+                 <button class="modal-close-btn" onclick="toggleCreateGameModal(false)">&times;</button>
+                 <h2>Create New Game</h2>
+                 <form id="create-game-form">
+                     <div class="mb-1">
+                         <label for="game-location">Location Name</label>
+                         <input type="text" id="game-location" required>
+                     </div>
+                     <div class="mb-1">
+                         <label for="game-datetime">Date & Time</label>
+                         <input type="datetime-local" id="game-datetime" required>
+                     </div>
+                     <!-- Add more options like court type, skill level etc. if needed -->
+                     <div id="create-game-error" class="error-text mb-1"></div>
+                     <button type="submit" class="btn-primary w-full">Create Game</button>
+                 </form>
+             </div>
+        </div>
+
+         <!-- Share Modal -->
+         <div id="share-modal" class="modal">
+             <div class="modal-content">
+                 <button class="modal-close-btn" onclick="toggleShareModal(false)">&times;</button>
+                 <h2>Share Game</h2>
+                 <div id="share-options">
+                     <p class="mb-1">Share this game link:</p>
+                     <input type="text" id="share-link-input" readonly>
+                     <button id="copy-share-link-btn" class="mt-1">Copy Link</button>
+                     <button id="web-share-api-btn" class="hidden">Share via...</button> <!-- Uses navigator.share -->
+                 </div>
+             </div>
+         </div>
+
+    </div> <!-- End #app-container -->
+
+    <script>
+        // --- SUPABASE CLIENT SETUP ---
+        // IMPORTANT: Replace with your actual Supabase URL and Anon Key
+        const SUPABASE_URL = 'https://aghnqhwhpiwndronbgkd.supabase.co'; // <- Replace this
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFnaG5xaHdocGl3bmRyb25iZ2tkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM5MDM4NTMsImV4cCI6MjA1OTQ3OTg1M30.jwYaXa_nb5HXQHjA3Bt6NUxYwQPDTawzNJvkOtI4Y1Q'; // <- Replace this
+
+        let supabase = null;
+        if (SUPABASE_URL && SUPABASE_ANON_KEY && SUPABASE_URL !== 'YOUR_SUPABASE_URL') {
+             supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        } else {
+            console.error("Supabase URL or Anon Key is not configured. App functionality will be limited.");
+            // Display an error to the user on the UI?
+            alert("App configuration error. Please contact support (or the developer!).");
+        }
+
+
+        // --- APPLICATION STATE ---
+        let currentUser = null;
+        let userProfile = null;
+        let currentScreen = 'loading'; // 'loading', 'auth', 'main', 'detail', 'active', 'end', 'profile', 'leaderboard'
+        let currentGameId = null;
+        let currentGameData = null;
+        let gameSubscription = null;
+        let gamesSubscription = null;
+        let chatSubscription = null; // Can be part of gameSubscription if chat is in game row
+        let scoreProposals = {}; // Key: proposerId_team, Value: { team, confirmedBy: [userId] }
+        let currentScoreProposal = null; // { proposedBy, team }
+        let confirmingScore = false; // Flag to prevent double confirms
+
+        // --- UI ELEMENTS CACHE ---
+        const screens = {
+            loading: document.getElementById('loading-screen'),
+            auth: document.getElementById('auth-screen'),
+            main: document.getElementById('main-app-screen'),
+            detail: document.getElementById('game-detail-screen'),
+            active: document.getElementById('active-game-screen'),
+            end: document.getElementById('game-end-screen'),
+            profile: document.getElementById('profile-screen'),
+            leaderboard: document.getElementById('leaderboard-screen'),
+        };
+        const authForm = document.getElementById('auth-form');
+        const authTitle = document.getElementById('auth-title');
+        const authSubmitBtn = document.getElementById('auth-submit-btn');
+        const authToggleBtn = document.getElementById('auth-toggle-btn');
+        const authToggleText = document.getElementById('auth-toggle-text');
+        const usernameField = document.getElementById('username-field');
+        const usernameInput = document.getElementById('username');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const authError = document.getElementById('auth-error');
+        const logoutBtn = document.getElementById('logout-btn');
+        const gameList = document.getElementById('game-list');
+        const gameListLoader = document.getElementById('game-list-loader');
+        const noGamesMessage = document.getElementById('no-games-message');
+        const createGameFab = document.getElementById('create-game-fab');
+        const createGameModal = document.getElementById('create-game-modal');
+        const createGameForm = document.getElementById('create-game-form');
+        const createGameError = document.getElementById('create-game-error');
+        const gameDetailLoader = document.getElementById('game-detail-loader');
+        const gameDetailContent = document.getElementById('game-detail-content');
+        const gameDetailLocation = document.getElementById('game-detail-location');
+        const gameDetailDatetime = document.getElementById('game-detail-datetime');
+        const gameDetailCreator = document.getElementById('game-detail-creator');
+        const gameDetailStatus = document.getElementById('game-detail-status').querySelector('.status-indicator');
+        const playerCount = document.getElementById('player-count');
+        const maxPlayers = document.getElementById('max-players'); // Assuming 10 for now
+        const playerList = document.getElementById('player-list');
+        const joinLeaveGameBtn = document.getElementById('join-leave-game-btn');
+        const beginGameBtn = document.getElementById('begin-game-btn');
+        const cancelGameBtn = document.getElementById('cancel-game-btn');
+        const shareGameBtn = document.getElementById('share-game-btn');
+        const gameDetailError = document.getElementById('game-detail-error');
+        const activeGameLoader = document.getElementById('active-game-loader');
+        const activeGameContent = document.getElementById('active-game-content');
+        const teamAScore = document.getElementById('team-a-score');
+        const teamBScore = document.getElementById('team-b-score');
+        const teamAList = document.getElementById('team-a-list');
+        const teamBList = document.getElementById('team-b-list');
+        const scoreProposalMessage = document.getElementById('score-proposal-message');
+        const scoreErrorMessage = document.getElementById('score-error-message');
+        const scoreConfirmationModal = document.getElementById('score-confirmation-modal');
+        const scoreConfirmText = document.getElementById('score-confirm-text');
+        const confirmScoreBtn = document.getElementById('confirm-score-btn');
+        const rejectScoreBtn = document.getElementById('reject-score-btn');
+        const gameEndScreen = document.getElementById('game-end-screen');
+        const gameEndTitle = document.getElementById('game-end-title');
+        const finalScore = document.getElementById('final-score');
+        const mvpUsername = document.getElementById('mvp-username');
+        const mvpScore = document.getElementById('mvp-score');
+        const confettiContainer = document.getElementById('confetti-container');
+        const backToMainBtn = document.getElementById('back-to-main-btn');
+        const viewLeaderboardBtn = document.getElementById('view-leaderboard-btn');
+        const shareResultsBtn = document.getElementById('share-results-btn');
+        const profileLoader = document.getElementById('profile-loader');
+        const profileContent = document.getElementById('profile-content');
+        const profileAvatar = document.getElementById('profile-avatar');
+        const profileUsername = document.getElementById('profile-username');
+        const profileEmail = document.getElementById('profile-email');
+        const editProfileBtn = document.getElementById('edit-profile-btn');
+        const saveProfileBtn = document.getElementById('save-profile-btn');
+        const editProfileUsernameInput = document.getElementById('edit-profile-username-input');
+        const profileUpdateMessage = document.getElementById('profile-update-message');
+        const profileUpdateError = document.getElementById('profile-update-error');
+        const profileStatPoints = document.getElementById('profile-stat-points');
+        const profileStatGames = document.getElementById('profile-stat-games');
+        const profileStatMvp = document.getElementById('profile-stat-mvp');
+        const gameHistoryLoader = document.getElementById('game-history-loader');
+        const gameHistoryList = document.getElementById('game-history-list');
+        const noHistoryMessage = document.getElementById('no-history-message');
+        const leaderboardLoader = document.getElementById('leaderboard-loader');
+        const leaderboardList = document.getElementById('leaderboard-list');
+        const noLeaderboardMessage = document.getElementById('no-leaderboard-message');
+        const profileNavBtn = document.getElementById('profile-nav-btn');
+        const leaderboardNavBtn = document.getElementById('leaderboard-nav-btn');
+        const backBtns = document.querySelectorAll('.back-btn');
+        const chatDrawer = document.getElementById('chat-drawer');
+        const chatMessages = document.getElementById('chat-messages');
+        const chatInput = document.getElementById('chat-input');
+        const sendChatBtn = document.getElementById('send-chat-btn');
+        const closeChatBtn = document.getElementById('close-chat-btn');
+        const toggleChatBtn = document.getElementById('toggle-chat-btn'); // Lobby chat toggle
+        const activeGameToggleChatBtn = document.getElementById('active-game-toggle-chat-btn'); // Active game chat toggle
+        const shareModal = document.getElementById('share-modal');
+        const shareLinkInput = document.getElementById('share-link-input');
+        const copyShareLinkBtn = document.getElementById('copy-share-link-btn');
+        const webShareApiBtn = document.getElementById('web-share-api-btn');
+
+
+        // --- UTILITY FUNCTIONS ---
+        const debounce = (func, delay) => {
+            let timeoutId;
+            return (...args) => {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => {
+                    func.apply(this, args);
+                }, delay);
+            };
+        };
+
+        const formatDate = (dateString) => {
+            if (!dateString) return 'Date TBD';
+            try {
+                const date = new Date(dateString);
+                 // Make more user friendly e.g., "Tomorrow, 6:00 PM" or "Jan 15, 2:30 PM"
+                 const now = new Date();
+                 const tomorrow = new Date(now);
+                 tomorrow.setDate(now.getDate() + 1);
+
+                 const optionsTime = { hour: 'numeric', minute: 'numeric', hour12: true };
+                 const optionsDate = { month: 'short', day: 'numeric' };
+
+                 if (date.toDateString() === now.toDateString()) {
+                     return `Today, ${date.toLocaleTimeString('en-US', optionsTime)}`;
+                 } else if (date.toDateString() === tomorrow.toDateString()) {
+                     return `Tomorrow, ${date.toLocaleTimeString('en-US', optionsTime)}`;
+                 } else {
+                     return `${date.toLocaleDateString('en-US', optionsDate)}, ${date.toLocaleTimeString('en-US', optionsTime)}`;
+                 }
+            } catch (e) {
+                console.error("Error formatting date:", dateString, e);
+                return "Invalid Date";
+            }
+        };
+
+        const showElement = (el) => el.classList.remove('hidden');
+        const hideElement = (el) => el.classList.add('hidden');
+        const enableElement = (el) => el.disabled = false;
+        const disableElement = (el) => el.disabled = true;
+
+        const navigateTo = (screenName) => {
+            if (!screens[screenName]) {
+                console.error("Tried to navigate to unknown screen:", screenName);
+                return;
+            }
+            console.log(`Navigating to ${screenName}`);
+            // Remove 'active' from all screens first
+            Object.values(screens).forEach(screen => screen.classList.remove('active'));
+            // Add 'active' to the target screen
+            screens[screenName].classList.add('active');
+            currentScreen = screenName;
+
+            // Reset relevant states when navigating away
+            if (screenName !== 'detail' && screenName !== 'active' && screenName !== 'end') {
+                 unsubscribeFromGame();
+                 currentGameId = null;
+                 currentGameData = null;
+            }
+             if (screenName !== 'main') {
+                  unsubscribeFromGamesList();
+             }
+             if (screenName !== 'detail' && screenName !== 'active') {
+                 closeChatDrawer(); // Close chat when leaving game context
+             }
+        };
+
+        const getUserAvatarText = (username) => {
+            return username ? username.charAt(0).toUpperCase() : '?';
+        }
+
+        const getUserProfile = async (userId) => {
+             if (!supabase) return null;
+             try {
+                 const { data, error } = await supabase
+                     .from('profiles')
+                     .select('*')
+                     .eq('user_id', userId)
+                     .single();
+                 if (error && error.code !== 'PGRST116') { // Ignore 'not found' error for single()
+                    console.error('Error fetching profile:', error);
+                    return null;
+                 }
+                 return data;
+             } catch (error) {
+                 console.error('Error fetching profile:', error);
+                 return null;
+             }
+         };
+
+        const updateUserProfile = async (userId, updates) => {
+             if (!supabase) return { error: { message: 'Supabase not initialized' } };
+             try {
+                 const { data, error } = await supabase
+                     .from('profiles')
+                     .update(updates)
+                     .eq('user_id', userId)
+                      .select() // Return updated data
+                      .single();
+                 return { data, error };
+             } catch (error) {
+                 console.error('Error updating profile:', error);
+                 return { error };
+             }
+        }
+
+        const createInitialUserProfile = async (userId, email, username) => {
+             if (!supabase) return { error: { message: 'Supabase not initialized' } };
+             try {
+                 // Ensure username uniqueness (or handle potential conflict gracefully)
+                 // A database trigger/function is better for production
+                 const { data: existingUser, error: checkError } = await supabase
+                     .from('profiles')
+                     .select('username')
+                     .eq('username', username)
+                     .maybeSingle(); // Check if username exists
+
+                 if (checkError) {
+                      console.error('Error checking username:', checkError);
+                      return { error: checkError };
+                 }
+                 if (existingUser) {
+                     return { error: { message: 'Username already taken.' } };
+                 }
+
+                 const { data, error } = await supabase
+                     .from('profiles')
+                     .insert({ user_id: userId, email: email, username: username })
+                     .select()
+                     .single();
+                 return { data, error };
+             } catch (error) {
+                 console.error('Error creating profile:', error);
+                 return { error };
+             }
+         };
+
+
+        // --- SCREEN RENDERING FUNCTIONS ---
+
+        const renderGameList = (games) => {
+            gameList.innerHTML = ''; // Clear previous list
+            hideElement(gameListLoader);
+            if (!games || games.length === 0) {
+                showElement(noGamesMessage);
+                return;
+            }
+            hideElement(noGamesMessage);
+
+            // Sort games: Pending first, then by start_time (soonest first)
+            games.sort((a, b) => {
+                if (a.status === 'pending' && b.status !== 'pending') return -1;
+                if (a.status !== 'pending' && b.status === 'pending') return 1;
+                // If statuses are the same or both not pending, sort by time
+                const timeA = a.start_time ? new Date(a.start_time).getTime() : Infinity;
+                const timeB = b.start_time ? new Date(b.start_time).getTime() : Infinity;
+                return timeA - timeB;
+            });
+
+
+            games.forEach(game => {
+                const li = document.createElement('li');
+                li.classList.add('game-list-item');
+                li.dataset.gameId = game.id;
+
+                const players = game.players || [];
+                const playerCount = players.length;
+                const maxP = 10; // Hardcoded for now
+
+                li.innerHTML = `
+                    <div class="game-info">
+                        <h3>${game.location_name || 'Unnamed Game'}</h3>
+                        <div class="game-meta">
+                            <span>📍 ${game.location_name || 'TBD'}</span> | <span>📅 ${formatDate(game.start_time)}</span>
+                        </div>
+                    </div>
+                    <div class="game-status-indicator status-${game.status || 'unknown'}">
+                         ${game.status === 'pending' ? `${playerCount}/${maxP} Players` : game.status.charAt(0).toUpperCase() + game.status.slice(1) }
+                    </div>
+                `;
+                li.addEventListener('click', () => handleGameItemClick(game.id));
+                gameList.appendChild(li);
+            });
+            // Trigger item animations after appending
+             requestAnimationFrame(() => {
+                document.querySelectorAll('.game-list-item').forEach(item => {
+                    item.style.opacity = '1'; // Ensure animation plays if already appended
+                });
+            });
+        };
+
+        const renderGameDetail = (game) => {
+             hideElement(gameDetailLoader);
+             if (!game) {
+                 gameDetailError.textContent = "Could not load game details.";
+                 showElement(gameDetailError);
+                 hideElement(gameDetailContent);
+                 return;
+             }
+             showElement(gameDetailContent);
+             hideElement(gameDetailError);
+             currentGameData = game; // Store current game data
+
+             gameDetailLocation.textContent = game.location_name || 'Unnamed Game';
+             gameDetailDatetime.textContent = `📅 ${formatDate(game.start_time)}`;
+             // Fetch creator profile for username if needed (better to join in query)
+             gameDetailCreator.textContent = `👑 Creator ID: ${game.creator_id.substring(0, 8)}...`; // Placeholder
+             fetchUserProfileAndSetCreator(game.creator_id);
+
+             const statusClass = `status-${game.status || 'unknown'}`;
+             gameDetailStatus.className = `status-indicator ${statusClass}`; // Reset classes
+             gameDetailStatus.textContent = game.status ? game.status.charAt(0).toUpperCase() + game.status.slice(1) : 'Unknown';
+
+
+             const players = game.players || [];
+             playerCount.textContent = players.length;
+             // maxPlayers.textContent = game.max_players || 10; // Use value from game data if available
+
+             playerList.innerHTML = '';
+             players.forEach(player => {
+                 const li = document.createElement('li');
+                 li.classList.add('player-list-item');
+                 li.innerHTML = `
+                     <div class="player-avatar">${getUserAvatarText(player.username)}</div>
+                     <span class="player-username">${player.username || 'Guest'}</span>
+                     <span class="player-status">${player.user_id === game.creator_id ? 'Creator' : ''}</span>
+                 `;
+                 playerList.appendChild(li);
+             });
+
+             // Update Button States based on game status and user participation
+             updateGameDetailButtons(game);
+
+              // Update chat log if needed (though usually handled by subscription)
+              renderChatMessages(game.chat_log || []);
+         };
+
+         const fetchUserProfileAndSetCreator = async (creatorId) => {
+             const profile = await getUserProfile(creatorId);
+             if (profile && profile.username) {
+                 gameDetailCreator.textContent = `👑 Created by ${profile.username}`;
+             }
+         };
+
+
+         const updateGameDetailButtons = (game) => {
+             if (!currentUser || !game) return;
+
+             const isCreator = game.creator_id === currentUser.id;
+             const players = game.players || [];
+             const isPlayer = players.some(p => p.user_id === currentUser.id);
+             const canJoin = players.length < 10 && !isPlayer && game.status === 'pending'; // Hardcoded 10 max players
+             const canLeave = isPlayer && game.status === 'pending' && !isCreator; // Creator cannot leave, must cancel
+             const canBegin = isCreator && game.status === 'pending' && players.length >= 2; // Need at least 2 to start
+             const canCancel = isCreator && game.status === 'pending';
+
+             // Join/Leave Button
+             if (canJoin) {
+                 joinLeaveGameBtn.textContent = 'Join Game';
+                 joinLeaveGameBtn.className = 'btn-primary';
+                 showElement(joinLeaveGameBtn);
+                 enableElement(joinLeaveGameBtn);
+             } else if (canLeave) {
+                 joinLeaveGameBtn.textContent = 'Leave Game';
+                 joinLeaveGameBtn.className = 'btn-danger';
+                 showElement(joinLeaveGameBtn);
+                 enableElement(joinLeaveGameBtn);
+             } else {
+                 hideElement(joinLeaveGameBtn); // Hide if already joined and creator, or game started/full etc.
+             }
+
+             // Begin Game Button
+             if (canBegin) {
+                 showElement(beginGameBtn);
+                 enableElement(beginGameBtn);
+             } else {
+                 hideElement(beginGameBtn);
+             }
+
+             // Cancel Game Button
+             if (canCancel) {
+                 showElement(cancelGameBtn);
+                 enableElement(cancelGameBtn);
+             } else {
+                 hideElement(cancelGameBtn);
+             }
+
+             // Share button is always visible for pending/active games
+              if(game.status === 'pending' || game.status === 'active') {
+                   showElement(shareGameBtn);
+              } else {
+                   hideElement(shareGameBtn);
+              }
+
+             // Redirect if game is active
+             if (game.status === 'active') {
+                 navigateTo('active');
+                 loadActiveGameScreen(game.id);
+             } else if (game.status === 'finished') {
+                 // Optionally show finished state here, or navigate directly to end screen
+                  navigateTo('end');
+                  loadGameEndScreen(game);
+             }
+         };
+
+
+         const renderActiveGame = (game) => {
+             hideElement(activeGameLoader);
+             if (!game || game.status !== 'active') {
+                 // Game might have ended or been cancelled while loading
+                 console.warn("Attempted to render active game, but status is not 'active'.", game?.status);
+                 // Maybe navigate back or show an error?
+                 if (game?.status === 'finished') {
+                      navigateTo('end');
+                      loadGameEndScreen(game);
+                 } else {
+                      navigateTo('main'); // Go back to list if game state is unexpected
+                 }
+                 return;
+             }
+             showElement(activeGameContent);
+             currentGameData = game;
+
+             teamAScore.textContent = game.score_a || 0;
+             teamBScore.textContent = game.score_b || 0;
+
+             const renderTeam = (teamListEl, teamData, teamName) => {
+                 teamListEl.innerHTML = `<h4>${teamName}</h4>`; // Clear previous
+                 const players = teamData || [];
+                 if (players.length === 0) {
+                      teamListEl.innerHTML += `<p style="font-size: 0.8em; color: #888; text-align: center;">No players assigned.</p>`;
+                 } else {
+                     players.forEach(player => {
+                         const div = document.createElement('div');
+                         div.classList.add('team-player');
+                         div.textContent = player.username || `User ${player.user_id.substring(0,6)}`;
+                         teamListEl.appendChild(div);
+                     });
+                 }
+             };
+
+             renderTeam(teamAList, game.team_a, 'Team A');
+             renderTeam(teamBList, game.team_b, 'Team B');
+
+             // Handle score proposals display (if using that mechanism)
+             updateScoreProposalUI(game.point_proposals); // You'll need to define this function based on your proposal structure
+
+              // Update chat log
+              renderChatMessages(game.chat_log || []);
+
+             // Check for game end condition (e.g., score limit)
+             const scoreLimit = 11; // Example score limit
+             if ((game.score_a >= scoreLimit || game.score_b >= scoreLimit) && game.score_a !== game.score_b) {
+                  // Ensure score is different to prevent ending on tie at limit
+                  endGame(game);
+             }
+         };
+
+         const renderGameEnd = (game) => {
+             if (!game) {
+                 console.error("No game data provided for end screen");
+                 // Maybe navigate back to main?
+                 backToMainBtn.onclick = () => navigateTo('main');
+                 return;
+             }
+
+             const winner = game.winner; // 'A', 'B', or null/draw
+             const scoreA = game.score_a || 0;
+             const scoreB = game.score_b || 0;
+
+             if (winner === 'A') {
+                 gameEndTitle.textContent = 'Team A Wins!';
+                 gameEndScreen.style.background = 'linear-gradient(180deg, var(--primary-color) 0%, #8A2BE2 100%)'; // More orange dominant
+             } else if (winner === 'B') {
+                 gameEndTitle.textContent = 'Team B Wins!';
+                  gameEndScreen.style.background = 'linear-gradient(180deg, var(--accent-color) 0%, var(--secondary-color) 100%)'; // More teal/purple
+             } else {
+                 gameEndTitle.textContent = 'It\'s a Draw!';
+                 gameEndScreen.style.background = 'linear-gradient(180deg, var(--surface-color) 0%, var(--background-color) 100%)';
+             }
+
+             finalScore.textContent = `Final Score: ${scoreA} - ${scoreB}`;
+
+             // Calculate and display MVP (simplistic: highest scorer in game)
+             // This needs refinement: requires tracking individual scores during the game
+             // For now, placeholder or use the pre-calculated `mvp_user_id` if available
+              if(game.mvp_user_id) {
+                  const allPlayers = [...(game.team_a || []), ...(game.team_b || [])];
+                  const mvp = allPlayers.find(p => p.user_id === game.mvp_user_id);
+                  if (mvp) {
+                       mvpUsername.textContent = mvp.username || 'Unknown MVP';
+                       // Need individual score data here!
+                       mvpScore.textContent = `(Stats unavailable in demo)`; // Placeholder
+                       showElement(document.getElementById('mvp-highlight'));
+                  } else {
+                       hideElement(document.getElementById('mvp-highlight'));
+                  }
+              } else {
+                  // Basic MVP calc (requires individual points - not implemented here)
+                  mvpUsername.textContent = 'MVP Calculation TBD';
+                  mvpScore.textContent = 'Individual scoring not tracked in this version';
+                  // hideElement(document.getElementById('mvp-highlight')); // Or show placeholder
+              }
+
+
+             startConfetti(); // Trigger visual effect
+
+             // Setup button actions
+             backToMainBtn.onclick = () => {
+                 stopConfetti();
+                 navigateTo('main');
+                 fetchGames(); // Refresh list
+             };
+             viewLeaderboardBtn.onclick = () => {
+                  stopConfetti();
+                  navigateTo('leaderboard');
+                  loadLeaderboardScreen();
+             };
+             shareResultsBtn.onclick = () => {
+                 const shareText = `Game Finished! ${game.location_name}: Team A (${scoreA}) vs Team B (${scoreB}). ${winner ? `Team ${winner} wins!` : 'Draw!'}`;
+                 showShareModal(shareText, window.location.href); // Share current URL or specific game result URL
+             };
+         };
+
+         const renderProfile = (profileData) => {
+             hideElement(profileLoader);
+             if (!profileData) {
+                 // Handle case where profile might not exist yet or failed to load
+                  profileContent.innerHTML = `<p class="error-text p-2">Could not load profile. Please try again later.</p>`;
+                  showElement(profileContent);
+                  return;
+             }
+             showElement(profileContent);
+
+             userProfile = profileData; // Cache profile data
+
+             profileUsername.textContent = profileData.username || 'No Username Set';
+             profileEmail.textContent = currentUser?.email || 'No email associated'; // Get email from auth user
+             profileAvatar.textContent = getUserAvatarText(profileData.username);
+             editProfileUsernameInput.value = profileData.username || ''; // Set input for editing
+
+             profileStatPoints.textContent = profileData.total_points_scored || 0;
+             profileStatGames.textContent = profileData.games_played || 0;
+             profileStatMvp.textContent = profileData.mvp_awards || 0;
+
+             // Load Game History
+              loadGameHistory(profileData.user_id);
+         };
+
+        const renderGameHistory = (games) => {
+             hideElement(gameHistoryLoader);
+             gameHistoryList.innerHTML = ''; // Clear list
+
+             if (!games || games.length === 0) {
+                 showElement(noHistoryMessage);
+                 return;
+             }
+             hideElement(noHistoryMessage);
+
+             // Sort by creation date, newest first
+             games.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+             games.forEach(game => {
+                 const li = document.createElement('li');
+                 li.classList.add('history-item');
+
+                 const isPlayerA = game.team_a?.some(p => p.user_id === currentUser.id);
+                 const isPlayerB = game.team_b?.some(p => p.user_id === currentUser.id);
+                 let result = 'N/A';
+                 let resultClass = '';
+
+                 if (game.winner === 'A' && isPlayerA) { result = 'Win'; resultClass = 'result-win'; }
+                 else if (game.winner === 'B' && isPlayerB) { result = 'Win'; resultClass = 'result-win'; }
+                 else if (game.winner === 'A' && isPlayerB) { result = 'Loss'; resultClass = 'result-loss'; }
+                 else if (game.winner === 'B' && isPlayerA) { result = 'Loss'; resultClass = 'result-loss'; }
+                 else if (game.winner === 'draw') { result = 'Draw'; }
+
+                 const isMvp = game.mvp_user_id === currentUser.id;
+
+                 li.innerHTML = `
+                     <div class="history-details">${game.location_name || 'Game'} - ${formatDate(game.created_at)}</div>
+                     <div class="history-score">Score: ${game.score_a || 0} - ${game.score_b || 0}</div>
+                     <div class="history-result ${resultClass}">Result: ${result} ${isMvp ? '(🏆 MVP)' : ''}</div>
+                 `;
+                 gameHistoryList.appendChild(li);
+             });
+        };
+
+        const renderLeaderboard = (players) => {
+             hideElement(leaderboardLoader);
+             leaderboardList.innerHTML = ''; // Clear list
+
+             if (!players || players.length === 0) {
+                 showElement(noLeaderboardMessage);
+                 return;
+             }
+             hideElement(noLeaderboardMessage);
+
+             // Sort players by total_points_scored descending
+             players.sort((a, b) => (b.total_points_scored || 0) - (a.total_points_scored || 0));
+
+             players.forEach((player, index) => {
+                 const li = document.createElement('li');
+                 li.classList.add('leaderboard-item');
+                 // Add animation delay dynamically
+                // li.style.animationDelay = `${index * 0.05}s`;
+
+                 li.innerHTML = `
+                     <span class="leaderboard-rank">${index + 1}</span>
+                     <div class="leaderboard-avatar">${getUserAvatarText(player.username)}</div>
+                     <div class="leaderboard-info">
+                         <div class="leaderboard-username">${player.username || 'Anonymous Player'}</div>
+                         <div class="leaderboard-stat">🏆 ${player.mvp_awards || 0} MVPs | ${player.games_played || 0} Games</div>
+                     </div>
+                     <div class="leaderboard-score">${player.total_points_scored || 0} PTS</div>
+                 `;
+                 leaderboardList.appendChild(li);
+             });
+
+             // Trigger item animations
+              requestAnimationFrame(() => {
+                document.querySelectorAll('.leaderboard-item').forEach(item => {
+                    item.style.opacity = '1';
+                });
+            });
+        };
+
+        const renderChatMessages = (messages) => {
+            if (!messages || !Array.isArray(messages)) {
+                console.warn("Invalid chat messages format:", messages);
+                 messages = []; // Ensure it's an array
+            }
+            const shouldScroll = chatMessages.scrollTop + chatMessages.clientHeight >= chatMessages.scrollHeight - 50; // Check if user is near the bottom
+
+             chatMessages.innerHTML = ''; // Simple redraw, could optimize for performance
+             messages.forEach(msg => {
+                 const messageDiv = document.createElement('div');
+                 messageDiv.classList.add('chat-message');
+                 const isOwnMessage = msg.user_id === currentUser?.id;
+                 if (isOwnMessage) {
+                     messageDiv.classList.add('own');
+                 }
+
+                 messageDiv.innerHTML = `
+                     <div class="message-bubble">${msg.message || ''}</div>
+                     <div class="message-meta">
+                         ${!isOwnMessage ? `<span class="message-sender">${msg.username || 'User'}</span>` : ''}
+                         <span>${formatDate(msg.timestamp || new Date())}</span>
+                     </div>
+                 `;
+                 chatMessages.appendChild(messageDiv);
+             });
+
+            // Scroll to bottom only if the user was already near the bottom
+             if (shouldScroll) {
+                 scrollToChatBottom();
+             }
+         };
+
+
+        // --- DATA FETCHING AND UPDATING ---
+
+        const fetchGames = async () => {
+            if (!supabase) return;
+            showElement(gameListLoader);
+            hideElement(noGamesMessage);
+            gameList.innerHTML = ''; // Clear list while loading
+
+            try {
+                const { data, error } = await supabase
+                    .from('games')
+                    .select('*')
+                    // .eq('status', 'pending') // Only show pending? Or all? Let's show all non-finished for now
+                    .in('status', ['pending', 'active'])
+                    .order('created_at', { ascending: false });
+
+                if (error) {
+                    throw error;
+                }
+                renderGameList(data);
+                subscribeToGamesList(); // Subscribe after initial fetch
+
+            } catch (error) {
+                console.error('Error fetching games:', error);
+                hideElement(gameListLoader);
+                showElement(noGamesMessage); // Show no games message on error too
+                noGamesMessage.textContent = "Could not load games. Try again later.";
+            }
+        };
+
+        const fetchGameDetails = async (gameId) => {
+             if (!supabase || !gameId) return;
+             showElement(gameDetailLoader);
+             hideElement(gameDetailContent);
+             hideElement(gameDetailError);
+
+             try {
+                 const { data, error } = await supabase
+                     .from('games')
+                     .select('*')
+                     .eq('id', gameId)
+                     .single(); // Expect only one game
+
+                 if (error) {
+                     throw error;
+                 }
+                 renderGameDetail(data);
+                 // Subscribe to real-time updates for this specific game
+                 subscribeToGame(gameId);
+             } catch (error) {
+                 console.error('Error fetching game details:', error);
+                 hideElement(gameDetailLoader);
+                 showElement(gameDetailError);
+                 gameDetailError.textContent = "Could not load game details. Please try again.";
+                 hideElement(gameDetailContent);
+             }
+         };
+
+        const createGame = async (location, dateTime) => {
+             if (!supabase || !currentUser) return { error: { message: 'Not logged in or Supabase unavailable.'}};
+             try {
+                 // Basic validation
+                 if (!location.trim() || !dateTime) {
+                      return { error: { message: 'Location and Date/Time are required.' } };
+                 }
+                 // Ensure user profile exists to get username
+                  if (!userProfile || !userProfile.username) {
+                      userProfile = await getUserProfile(currentUser.id); // Fetch if missing
+                      if (!userProfile || !userProfile.username) {
+                           return { error: { message: 'Complete your profile (username) before creating games.' } };
+                      }
+                  }
+
+                 const initialPlayer = { user_id: currentUser.id, username: userProfile.username };
+
+                 const { data, error } = await supabase
+                     .from('games')
+                     .insert({
+                         creator_id: currentUser.id,
+                         location_name: location,
+                         start_time: dateTime,
+                         status: 'pending',
+                         players: [initialPlayer], // Add creator as first player
+                         chat_log: [{ // Initial chat message
+                             user_id: 'system', // Or null
+                             username: 'System',
+                             message: `${userProfile.username} created the game!`,
+                             timestamp: new Date().toISOString()
+                         }]
+                     })
+                     .select() // Return the created game data
+                     .single();
+
+                 return { data, error };
+             } catch (error) {
+                 console.error('Error creating game:', error);
+                 return { error };
+             }
+         };
+
+        const joinGame = async (gameId) => {
+             if (!supabase || !currentUser || !currentGameData) return;
+             disableElement(joinLeaveGameBtn);
+             try {
+                  // Ensure user profile exists to get username
+                  if (!userProfile || !userProfile.username) {
+                      userProfile = await getUserProfile(currentUser.id);
+                      if (!userProfile || !userProfile.username) {
+                           throw new Error('Please set your username in your profile first.');
+                      }
+                  }
+                 const players = currentGameData.players || [];
+                 if (players.length >= 10) { // Max players check
+                     throw new Error('Game is full!');
+                 }
+                  if (players.some(p => p.user_id === currentUser.id)) {
+                     throw new Error('You are already in this game.');
+                 }
+
+                 const newPlayer = { user_id: currentUser.id, username: userProfile.username };
+                 const updatedPlayers = [...players, newPlayer];
+
+                  const joinMessage = {
+                      user_id: 'system', username: 'System',
+                      message: `${userProfile.username} joined the game!`,
+                      timestamp: new Date().toISOString()
+                  };
+                 const updatedChatLog = [...(currentGameData.chat_log || []), joinMessage];
+
+
+                 const { error } = await supabase
+                     .from('games')
+                     .update({ players: updatedPlayers, chat_log: updatedChatLog })
+                     .eq('id', gameId);
+
+                 if (error) throw error;
+                 // UI will update via realtime subscription, but can force refresh if needed
+                 // fetchGameDetails(gameId); // Re-fetch to update UI immediately
+
+             } catch (error) {
+                 console.error('Error joining game:', error);
+                 gameDetailError.textContent = `Error joining game: ${error.message}`;
+                 showElement(gameDetailError);
+                 enableElement(joinLeaveGameBtn); // Re-enable button on error
+             }
+         };
+
+        const leaveGame = async (gameId) => {
+            if (!supabase || !currentUser || !currentGameData) return;
+            disableElement(joinLeaveGameBtn);
+            try {
+                let players = currentGameData.players || [];
+                if (!players.some(p => p.user_id === currentUser.id)) {
+                    throw new Error('You are not in this game.');
+                }
+                 if (currentGameData.creator_id === currentUser.id) {
+                     throw new Error('Creator cannot leave, please cancel the game instead.');
+                 }
+
+                const updatedPlayers = players.filter(p => p.user_id !== currentUser.id);
+
+                 const leaveMessage = {
+                      user_id: 'system', username: 'System',
+                      message: `${userProfile?.username || 'A player'} left the game.`,
+                      timestamp: new Date().toISOString()
+                  };
+                 const updatedChatLog = [...(currentGameData.chat_log || []), leaveMessage];
+
+
+                const { error } = await supabase
+                    .from('games')
+                    .update({ players: updatedPlayers, chat_log: updatedChatLog })
+                    .eq('id', gameId);
+
+                if (error) throw error;
+                 // UI updates via subscription
+                 // fetchGameDetails(gameId); // Or force refresh
+
+            } catch (error) {
+                console.error('Error leaving game:', error);
+                gameDetailError.textContent = `Error leaving game: ${error.message}`;
+                showElement(gameDetailError);
+                enableElement(joinLeaveGameBtn);
+            }
+        };
+
+        const cancelGame = async (gameId) => {
+             if (!supabase || !currentUser || !currentGameData) return;
+              if (currentGameData.creator_id !== currentUser.id) {
+                   console.error("Only the creator can cancel the game.");
+                   gameDetailError.textContent = "Only the creator can cancel the game.";
+                   showElement(gameDetailError);
+                   return;
+              }
+             disableElement(cancelGameBtn);
+             disableElement(beginGameBtn); // Also disable begin
+
+             if (!confirm("Are you sure you want to cancel this game? This cannot be undone.")) {
+                   enableElement(cancelGameBtn);
+                   if (currentGameData.players.length >= 2) enableElement(beginGameBtn);
+                   return;
+             }
+
+             try {
+                 const { error } = await supabase
+                     .from('games')
+                     .update({ status: 'cancelled' }) // Or delete? Update status is safer
+                     .eq('id', gameId);
+
+                 if (error) throw error;
+
+                 // Unsubscribe and navigate back
+                 unsubscribeFromGame();
+                 navigateTo('main');
+                 fetchGames(); // Refresh list
+
+             } catch (error) {
+                 console.error('Error cancelling game:', error);
+                 gameDetailError.textContent = `Error cancelling game: ${error.message}`;
+                 showElement(gameDetailError);
+                 // Re-enable buttons if needed based on previous state
+                 enableElement(cancelGameBtn);
+                  if (currentGameData.players?.length >= 2) enableElement(beginGameBtn);
+             }
+        };
+
+        const beginGame = async (gameId) => {
+            if (!supabase || !currentUser || !currentGameData) return;
+            if (currentGameData.creator_id !== currentUser.id) {
+                 console.error("Only the creator can begin the game.");
+                 gameDetailError.textContent = "Only the creator can begin the game.";
+                 showElement(gameDetailError);
+                 return;
+            }
+             if ((currentGameData.players?.length || 0) < 2) {
+                 gameDetailError.textContent = "Need at least 2 players to start.";
+                 showElement(gameDetailError);
+                 return;
+             }
+
+            disableElement(beginGameBtn);
+            disableElement(cancelGameBtn);
+             disableElement(joinLeaveGameBtn);
+
+            try {
+                 // --- Team Randomization ---
+                 let players = [...(currentGameData.players || [])]; // Copy players array
+                 // Shuffle players (Fisher-Yates shuffle)
+                 for (let i = players.length - 1; i > 0; i--) {
+                     const j = Math.floor(Math.random() * (i + 1));
+                     [players[i], players[j]] = [players[j], players[i]];
+                 }
+                 // Split into two teams
+                 const midPoint = Math.ceil(players.length / 2);
+                 const teamA = players.slice(0, midPoint);
+                 const teamB = players.slice(midPoint);
+
+                 const startMessage = {
+                      user_id: 'system', username: 'System',
+                      message: `The game has started! Good luck!`,
+                      timestamp: new Date().toISOString()
+                  };
+                 const updatedChatLog = [...(currentGameData.chat_log || []), startMessage];
+
+
+                 // Update game record in Supabase
+                 const { error } = await supabase
+                     .from('games')
+                     .update({
+                         status: 'active',
+                         team_a: teamA,
+                         team_b: teamB,
+                         score_a: 0, // Reset scores
+                         score_b: 0,
+                         point_proposals: null, // Clear any old proposals
+                         chat_log: updatedChatLog
+                     })
+                     .eq('id', gameId);
+
+                 if (error) throw error;
+
+                 // Navigate to Active Game Screen - handled by subscription update
+
+            } catch (error) {
+                 console.error('Error beginning game:', error);
+                 gameDetailError.textContent = `Error starting game: ${error.message}`;
+                 showElement(gameDetailError);
+                 // Re-enable buttons based on previous state
+                 enableElement(beginGameBtn);
+                 enableElement(cancelGameBtn);
+                 updateGameDetailButtons(currentGameData); // Refresh button states
+            }
+        };
+
+        // --- Collaborative Scoring Logic ---
+        // This is a simplified version. Real-world needs more robust handling
+        // of conflicts, timeouts, and potential cheating.
+        // We'll store proposals in the 'point_proposals' JSONB field.
+        // Format: { "teamA": { proposedBy: "uuid", confirmedBy: ["uuid1", "uuid2"] }, "teamB": { ... } }
+
+        const proposeScore = async (team) => { // team is 'A' or 'B'
+            if (!supabase || !currentUser || !currentGameData || currentGameData.status !== 'active' || confirmingScore) return;
+
+            const proposalKey = team === 'A' ? 'teamA' : 'teamB';
+            const currentProposals = currentGameData.point_proposals || {};
+
+             // Prevent proposing if already confirming or if a proposal for the *other* team exists
+             if (confirmingScore || (currentProposals && Object.keys(currentProposals).length > 0 && !currentProposals[proposalKey])) {
+                  setScoreErrorMessage("Wait for the current score proposal to resolve.");
+                  return;
+             }
+              // Prevent proposing if you already proposed for this team
+             if (currentProposals[proposalKey]?.proposedBy === currentUser.id) {
+                  setScoreErrorMessage("You already proposed for this team.");
+                  return;
+             }
+
+             // Prevent proposing if you already CONFIRMED for this team's current proposal
+              if (currentProposals[proposalKey]?.confirmedBy?.includes(currentUser.id)) {
+                  setScoreErrorMessage("You already confirmed this score.");
+                  return;
+             }
+
+
+            console.log(`Proposing +1 for Team ${team}`);
+            setScoreProposalMessage(`Proposing +1 for Team ${team}... Waiting for confirmation...`);
+            hideElement(scoreErrorMessage);
+
+            let newProposalData;
+            if (currentProposals[proposalKey]) {
+                 // Proposal for this team already exists, add confirmation
+                 if (currentProposals[proposalKey].confirmedBy?.includes(currentUser.id)) return; // Already confirmed
+                 newProposalData = {
+                     ...currentProposals,
+                     [proposalKey]: {
+                         ...currentProposals[proposalKey],
+                         confirmedBy: [...(currentProposals[proposalKey].confirmedBy || []), currentUser.id]
+                     }
+                 };
+            } else {
+                 // New proposal for this team
+                 newProposalData = {
+                     ...currentProposals, // Keep other team's proposal if it exists (though UI prevents this flow now)
+                     [proposalKey]: {
+                         proposedBy: currentUser.id,
+                         confirmedBy: [currentUser.id] // Proposer auto-confirms
+                     }
+                 };
+            }
+
+            try {
+                 const { error } = await supabase
+                     .from('games')
+                     .update({ point_proposals: newProposalData })
+                     .eq('id', currentGameId);
+
+                 if (error) throw error;
+                 // Realtime update will trigger check for unanimous confirmation
+            } catch (error) {
+                 console.error("Error proposing score:", error);
+                 setScoreErrorMessage("Error submitting proposal.");
+                 hideElement(scoreProposalMessage);
+            }
+
+        };
+
+        const confirmScoreProposal = async () => {
+            if (!supabase || !currentUser || !currentGameData || !currentScoreProposal || confirmingScore) return;
+            if (currentScoreProposal.proposedBy === currentUser.id) return; // Cannot confirm own initial proposal
+
+            confirmingScore = true;
+            disableElement(confirmScoreBtn);
+            disableElement(rejectScoreBtn);
+
+            const proposalKey = currentScoreProposal.team === 'A' ? 'teamA' : 'teamB';
+            let currentProposals = currentGameData.point_proposals || {};
+
+             // Ensure the proposal still exists and hasn't been confirmed by user already
+            if (!currentProposals[proposalKey] || currentProposals[proposalKey].confirmedBy?.includes(currentUser.id)) {
+                console.warn("Proposal not found or already confirmed by user.");
+                resetScoreConfirmationUI();
+                confirmingScore = false;
+                return;
+            }
+
+            const updatedProposal = {
+                 ...currentProposals[proposalKey],
+                 confirmedBy: [...(currentProposals[proposalKey].confirmedBy || []), currentUser.id]
+             };
+             const newProposalData = {
+                 ...currentProposals,
+                 [proposalKey]: updatedProposal
+             };
+
+            try {
+                 const { error } = await supabase
+                     .from('games')
+                     .update({ point_proposals: newProposalData })
+                     .eq('id', currentGameId);
+
+                 if (error) throw error;
+                 // Let the real-time handler check for completion
+                 resetScoreConfirmationUI(); // Hide modal after confirming
+            } catch (error) {
+                 console.error("Error confirming score:", error);
+                 setScoreErrorMessage("Failed to confirm score."); // Show error on main screen
+                 resetScoreConfirmationUI();
+            } finally {
+                confirmingScore = false;
+            }
+        };
+
+        const rejectScoreProposal = () => {
+             // Simple rejection: Just close the modal.
+             // A more robust system might notify the proposer or clear the proposal.
+             resetScoreConfirmationUI();
+              setScoreProposalMessage("Score proposal rejected/ignored."); // Give feedback
+        };
+
+        const checkAndApplyScore = async (gameData) => {
+            if (!gameData || !gameData.point_proposals || Object.keys(gameData.point_proposals).length === 0) {
+                 resetScoreConfirmationUI(); // Ensure modal is hidden if proposals are cleared
+                 return; // No active proposals
+             }
+
+             const proposals = gameData.point_proposals;
+             const totalPlayers = (gameData.team_a?.length || 0) + (gameData.team_b?.length || 0);
+             // Simple unanimous: everyone must confirm. Stricter, adjust as needed (e.g., >50%)
+             const requiredConfirmations = totalPlayers;
+
+             let scoreUpdated = false;
+             let proposalKeyToDelete = null;
+             let updatePayload = {};
+
+             for (const key in proposals) { // key is "teamA" or "teamB"
+                 const proposal = proposals[key];
+                 if (proposal && proposal.confirmedBy && proposal.confirmedBy.length >= requiredConfirmations) {
+                     // Unanimous agreement reached!
+                     const team = key === 'teamA' ? 'A' : 'B';
+                     console.log(`Unanimous confirmation for Team ${team}! Applying score.`);
+
+                     if (team === 'A') {
+                         updatePayload.score_a = (gameData.score_a || 0) + 1;
+                     } else {
+                         updatePayload.score_b = (gameData.score_b || 0) + 1;
+                     }
+                      updatePayload.point_proposals = null; // Clear proposals after successful score
+                      scoreUpdated = true;
+                      break; // Process one score update at a time
+                 }
+             }
+
+             if (scoreUpdated) {
+                  // Prevent UI flicker by hiding messages immediately
+                 hideElement(scoreProposalMessage);
+                 hideElement(scoreErrorMessage);
+                 resetScoreConfirmationUI();
+
+                 try {
+                     const { error } = await supabase
+                         .from('games')
+                         .update(updatePayload)
+                         .eq('id', gameData.id);
+                     if (error) throw error;
+                     console.log("Score applied successfully.");
+                     // Realtime update will refresh scores. Check for game end condition again.
+                      const updatedGameData = { ...gameData, ...updatePayload };
+                      const scoreLimit = 11;
+                      if ((updatedGameData.score_a >= scoreLimit || updatedGameData.score_b >= scoreLimit) && updatedGameData.score_a !== updatedGameData.score_b) {
+                           endGame(updatedGameData);
+                      }
+
+                 } catch (error) {
+                     console.error("Error applying final score:", error);
+                     setScoreErrorMessage("Error applying score update.");
+                 }
+             } else {
+                  // No score applied, just update the UI based on current proposal state
+                   updateScoreProposalUI(proposals);
+             }
+        };
+
+        // Update UI based on current proposals (show confirmation modal if needed)
+        const updateScoreProposalUI = (proposals) => {
+             hideElement(scoreProposalMessage); // Hide previous status messages
+             hideElement(scoreErrorMessage);
+             proposals = proposals || {};
+             let activeProposal = null;
+             let activeProposalKey = null;
+
+             // Find the first active proposal (should only be one based on proposeScore logic)
+             for (const key in proposals) {
+                  if (proposals[key]) {
+                       activeProposal = proposals[key];
+                       activeProposalKey = key;
+                       break;
+                  }
+             }
+
+            if (activeProposal) {
+                const team = activeProposalKey === 'teamA' ? 'A' : 'B';
+                const proposerId = activeProposal.proposedBy;
+                const confirmedBy = activeProposal.confirmedBy || [];
+
+                // Check if current user needs to confirm
+                if (currentUser && proposerId !== currentUser.id && !confirmedBy.includes(currentUser.id)) {
+                     currentScoreProposal = { proposedBy: proposerId, team: team };
+                     scoreConfirmText.textContent = `Confirm +1 for Team ${team}? (${confirmedBy.length}/${(currentGameData.team_a?.length || 0) + (currentGameData.team_b?.length || 0)} confirmed)`;
+                     showScoreConfirmationModal();
+                } else {
+                     // User proposed, already confirmed, or not logged in - don't show modal
+                     resetScoreConfirmationUI();
+                      // Show status message on main screen
+                      setScoreProposalMessage(`Waiting for confirmation for Team ${team}... (${confirmedBy.length}/${(currentGameData.team_a?.length || 0) + (currentGameData.team_b?.length || 0)})`);
+                }
+            } else {
+                 // No active proposals
+                 resetScoreConfirmationUI();
+            }
+        };
+
+
+        const showScoreConfirmationModal = () => {
+             scoreConfirmationModal.classList.add('visible');
+             enableElement(confirmScoreBtn);
+             enableElement(rejectScoreBtn);
+        };
+
+        const resetScoreConfirmationUI = () => {
+            scoreConfirmationModal.classList.remove('visible');
+            currentScoreProposal = null;
+        };
+
+        const setScoreProposalMessage = (message) => {
+            scoreProposalMessage.textContent = message;
+            showElement(scoreProposalMessage);
+            hideElement(scoreErrorMessage); // Hide error when proposal message shown
+        };
+
+        const setScoreErrorMessage = (message) => {
+            scoreErrorMessage.textContent = message;
+            showElement(scoreErrorMessage);
+            hideElement(scoreProposalMessage); // Hide proposal when error shown
+             // Optionally hide message after a few seconds
+             setTimeout(() => hideElement(scoreErrorMessage), 5000);
+        };
+
+
+        const endGame = async (gameData) => {
+             if (!supabase || !currentUser || gameData.status !== 'active') return; // Already ended or not active
+
+             console.log("Ending game:", gameData.id);
+             const scoreA = gameData.score_a || 0;
+             const scoreB = gameData.score_b || 0;
+             const winner = scoreA > scoreB ? 'A' : (scoreB > scoreA ? 'B' : 'draw'); // Determine winner
+
+             // --- MVP Calculation (Placeholder - needs individual scores) ---
+             // In a real app, you'd track individual points during the game.
+             // Simplistic: Assign MVP randomly or to creator for demo purposes.
+             // Let's assign to the first player of the winning team for this example.
+             let mvpUserId = null;
+             const winningTeam = winner === 'A' ? gameData.team_a : (winner === 'B' ? gameData.team_b : null);
+             if (winningTeam && winningTeam.length > 0) {
+                  mvpUserId = winningTeam[0].user_id; // Assign to first player on winning team
+             }
+
+             // --- Prepare Update Payload ---
+             const updatePayload = {
+                 status: 'finished',
+                 winner: winner,
+                 mvp_user_id: mvpUserId,
+                 point_proposals: null // Clear any lingering proposals
+             };
+
+             try {
+                 // Update Game Status in DB
+                 const { error: gameUpdateError } = await supabase
+                     .from('games')
+                     .update(updatePayload)
+                     .eq('id', gameData.id);
+
+                 if (gameUpdateError) throw gameUpdateError;
+
+                 // Update Player Stats (Crucial Part)
+                 const players = [...(gameData.team_a || []), ...(gameData.team_b || [])];
+                 for (const player of players) {
+                     const { data: profile, error: profileError } = await getUserProfile(player.user_id);
+                     if (profileError) {
+                         console.error(`Error fetching profile for ${player.user_id}`, profileError);
+                         continue; // Skip this player if profile fetch fails
+                     }
+                     if (!profile) {
+                          console.warn(`Profile not found for ${player.user_id}, skipping stats update.`);
+                          continue;
+                     }
+
+
+                     const updates = {
+                         games_played: (profile.games_played || 0) + 1,
+                         // total_points_scored: (profile.total_points_scored || 0) + (player.pointsInThisGame || 0), // Needs real scoring
+                         mvp_awards: (profile.mvp_awards || 0) + (player.user_id === mvpUserId ? 1 : 0)
+                     };
+
+                      // Placeholder points update: Add score difference to winner's total? Highly inaccurate.
+                      // Or just give everyone some points for playing?
+                      const pointsEarned = 5; // Base points for playing
+                      updates.total_points_scored = (profile.total_points_scored || 0) + pointsEarned;
+                       if (player.user_id === mvpUserId) {
+                           updates.total_points_scored += 10; // MVP bonus
+                       }
+
+                      const { error: updateError } = await updateUserProfile(player.user_id, updates);
+                      if (updateError) {
+                          console.error(`Error updating profile stats for ${player.user_id}`, updateError);
+                      }
+                 }
+
+                 console.log("Game ended successfully and stats updated (partially).");
+                 // Navigation to end screen is handled by the realtime subscription seeing the 'finished' status update.
+
+             } catch (error) {
+                 console.error("Error ending game:", error);
+                 setScoreErrorMessage("Error finalizing game. Please try again later.");
+             }
+         };
+
+        const sendChatMessage = async (message) => {
+             if (!supabase || !currentUser || !currentGameData || !message.trim()) return;
+             if (!userProfile || !userProfile.username) {
+                  console.error("User profile/username not loaded. Cannot send chat.");
+                  return; // Need username to display message correctly
+             }
+
+             const newMessage = {
+                 user_id: currentUser.id,
+                 username: userProfile.username,
+                 message: message.trim(),
+                 timestamp: new Date().toISOString()
+             };
+
+             const updatedChatLog = [...(currentGameData.chat_log || []), newMessage];
+
+             // Optimistic UI update
+             renderChatMessages(updatedChatLog);
+             scrollToChatBottom();
+             chatInput.value = ''; // Clear input
+
+             try {
+                 const { error } = await supabase
+                     .from('games')
+                     .update({ chat_log: updatedChatLog })
+                     .eq('id', currentGameId);
+
+                 if (error) {
+                     throw error;
+                 }
+                 // Data is now persisted
+
+             } catch (error) {
+                 console.error("Error sending chat message:", error);
+                 // Optionally revert optimistic update or show error
+                 alert("Failed to send message. Please try again.");
+                 // Re-fetch game data might be needed to correct chat log if persistence failed
+                  fetchGameDetails(currentGameId);
+             }
+         };
+
+
+         const fetchProfileData = async (userId) => {
+             if (!supabase) return;
+             showElement(profileLoader);
+             hideElement(profileContent);
+             try {
+                 const profile = await getUserProfile(userId);
+                 renderProfile(profile);
+             } catch (error) {
+                 console.error("Error loading profile screen:", error);
+                 hideElement(profileLoader);
+                 profileContent.innerHTML = `<p class="error-text p-2">Failed to load profile data.</p>`;
+                 showElement(profileContent);
+             }
+         };
+
+         const loadGameHistory = async (userId) => {
+             if (!supabase) return;
+             showElement(gameHistoryLoader);
+             hideElement(noHistoryMessage);
+             gameHistoryList.innerHTML = '';
+
+             try {
+                 const { data, error } = await supabase
+                     .from('games')
+                     .select('*')
+                     // This filter is tricky with players in JSONB.
+                     // A better approach is a separate game_players table.
+                     // Workaround: Filter client-side (inefficient for large history)
+                     // Or use Supabase function/view if possible.
+                     // Let's try fetching all finished games and filtering client-side for demo:
+                     .eq('status', 'finished')
+                     .order('created_at', { ascending: false })
+                     .limit(50); // Limit history size
+
+                 if (error) throw error;
+
+                 // Client-side filter (adjust if using relational table)
+                 const userHistory = data.filter(game =>
+                     game.players?.some(p => p.user_id === userId) ||
+                     game.team_a?.some(p => p.user_id === userId) ||
+                     game.team_b?.some(p => p.user_id === userId)
+                 );
+
+                 renderGameHistory(userHistory);
+
+             } catch (error) {
+                 console.error("Error fetching game history:", error);
+                 hideElement(gameHistoryLoader);
+                 showElement(noHistoryMessage);
+                 noHistoryMessage.textContent = "Could not load game history.";
+             }
+         };
+
+        const fetchLeaderboard = async () => {
+             if (!supabase) return;
+             showElement(leaderboardLoader);
+             hideElement(noLeaderboardMessage);
+             leaderboardList.innerHTML = '';
+
+             try {
+                 const { data, error } = await supabase
+                     .from('profiles')
+                     .select('user_id, username, total_points_scored, games_played, mvp_awards')
+                     .order('total_points_scored', { ascending: false, nullsFirst: false }) // Handle nulls
+                     .limit(50); // Limit leaderboard size
+
+                 if (error) throw error;
+
+                 renderLeaderboard(data);
+
+             } catch (error) {
+                 console.error("Error fetching leaderboard:", error);
+                 hideElement(leaderboardLoader);
+                 showElement(noLeaderboardMessage);
+                 noLeaderboardMessage.textContent = "Could not load leaderboard.";
+             }
+        };
+
+
+        // --- REALTIME SUBSCRIPTIONS ---
+
+        const subscribeToGamesList = () => {
+            if (!supabase) return;
+            unsubscribeFromGamesList(); // Ensure no duplicates
+
+            console.log("Subscribing to games list changes...");
+            gamesSubscription = supabase.channel('public:games')
+                .on('postgres_changes',
+                    { event: '*', schema: 'public', table: 'games' },
+                    (payload) => {
+                        console.log('Change received on games table!', payload);
+                        // Basic approach: re-fetch the entire list on any change.
+                        // Could be optimized to handle specific insert/update/delete.
+                        if (currentScreen === 'main') {
+                             console.log("Re-fetching games list due to change.");
+                             fetchGames();
+                        }
+                    }
+                )
+                .subscribe((status, err) => {
+                     if (status === 'SUBSCRIBED') {
+                         console.log('Successfully subscribed to games list!');
+                     }
+                      if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+                          console.error('Games list subscription error:', status, err);
+                           // Optionally try to resubscribe after a delay
+                      }
+                 });
+        };
+
+        const unsubscribeFromGamesList = () => {
+            if (gamesSubscription) {
+                 console.log("Unsubscribing from games list.");
+                 supabase.removeChannel(gamesSubscription);
+                 gamesSubscription = null;
+            }
+        };
+
+
+        const subscribeToGame = (gameId) => {
+             if (!supabase || !gameId) return;
+             unsubscribeFromGame(); // Ensure no duplicates
+
+             console.log(`Subscribing to game ${gameId}...`);
+             // Use a unique channel name per game
+             const channelName = `game-${gameId}`;
+             gameSubscription = supabase.channel(channelName)
+                 .on('postgres_changes',
+                     {
+                         event: 'UPDATE',
+                         schema: 'public',
+                         table: 'games',
+                         filter: `id=eq.${gameId}` // Filter updates for THIS game
+                     },
+                     (payload) => {
+                         console.log(`Game ${gameId} updated!`, payload);
+                         const updatedGame = payload.new;
+                         currentGameData = updatedGame; // Update local cache immediately
+
+                         // Re-render based on current screen and game status
+                         if (currentScreen === 'detail' && updatedGame.status === 'pending') {
+                              renderGameDetail(updatedGame);
+                         } else if (currentScreen === 'detail' && updatedGame.status === 'active') {
+                              // Status changed to active while viewing detail, navigate
+                               navigateTo('active');
+                               renderActiveGame(updatedGame); // Render immediately
+                         } else if (currentScreen === 'active' && updatedGame.status === 'active') {
+                               renderActiveGame(updatedGame);
+                               // Check proposals after rendering scores/teams
+                                checkAndApplyScore(updatedGame);
+                         } else if (currentScreen === 'active' && updatedGame.status === 'finished') {
+                               // Game finished while player was in active screen
+                               navigateTo('end');
+                               loadGameEndScreen(updatedGame); // Fetch full data if needed, or use payload
+                         } else if (currentScreen === 'detail' && updatedGame.status === 'finished') {
+                               // Game finished while player was in lobby
+                               navigateTo('end');
+                               loadGameEndScreen(updatedGame);
+                         } else if ((currentScreen === 'active' || currentScreen === 'detail') && updatedGame.status === 'cancelled') {
+                              // Game cancelled while viewing/playing
+                               alert("This game has been cancelled by the creator.");
+                               navigateTo('main');
+                               fetchGames();
+                         }
+                         // Update chat separately if needed, or rely on render functions
+                         if (currentScreen === 'detail' || currentScreen === 'active') {
+                              renderChatMessages(updatedGame.chat_log || []);
+                         }
+                     }
+                 )
+                 .subscribe((status, err) => {
+                     if (status === 'SUBSCRIBED') {
+                         console.log(`Successfully subscribed to game ${gameId}!`);
+                     }
+                      if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+                          console.error(`Game ${gameId} subscription error:`, status, err);
+                           // Handle error, maybe retry subscription
+                           if(currentScreen === 'detail' || currentScreen === 'active') {
+                               alert("Real-time connection lost. Some updates might be delayed.");
+                           }
+                      }
+                 });
+         };
+
+
+        const unsubscribeFromGame = () => {
+            if (gameSubscription) {
+                console.log("Unsubscribing from current game.");
+                supabase.removeChannel(gameSubscription);
+                gameSubscription = null;
+            }
+        };
+
+
+        // --- AUTHENTICATION LOGIC ---
+
+        const handleAuth = async (event) => {
+            event.preventDefault();
+            if (!supabase) return;
+            const isSignUp = authSubmitBtn.textContent === 'Sign Up';
+            const email = emailInput.value.trim();
+            const password = passwordInput.value;
+            const uname = usernameInput.value.trim();
+
+            authError.textContent = '';
+            disableElement(authSubmitBtn);
+
+            try {
+                let authResponse;
+                 let profileResponse;
+
+                if (isSignUp) {
+                    if (!uname || uname.length < 3) {
+                         throw new Error("Username must be at least 3 characters long.");
+                     }
+                    // 1. Sign up the user
+                    authResponse = await supabase.auth.signUp({ email, password });
+                    if (authResponse.error) throw authResponse.error;
+                     if (!authResponse.data.user) throw new Error("Signup succeeded but no user data returned.");
+
+                    // 2. Create the profile immediately after successful signup
+                     profileResponse = await createInitialUserProfile(authResponse.data.user.id, email, uname);
+                     if (profileResponse.error) {
+                          // Signup worked, but profile creation failed. This is problematic.
+                          // Maybe try to delete the user or ask them to contact support?
+                          console.error("Profile creation failed after signup:", profileResponse.error);
+                          // Attempt to sign the user in anyway, they might need to set username later.
+                          // Or display a specific error message.
+                           throw new Error(`Account created, but profile setup failed: ${profileResponse.error.message}. Please try logging in or contact support.`);
+                     }
+                     userProfile = profileResponse.data; // Set profile immediately
+                     alert("Sign up successful! Please check your email for verification."); // Inform user about verification
+
+                } else {
+                    // Login
+                    authResponse = await supabase.auth.signInWithPassword({ email, password });
+                    if (authResponse.error) throw authResponse.error;
+                     if (!authResponse.data.user) throw new Error("Login succeeded but no user data returned.");
+                     // Profile will be fetched in checkUserSession
+                }
+
+                // If login/signup successful (and profile created for signup)
+                currentUser = authResponse.data.user;
+                await checkUserSession(); // Fetch profile and navigate
+
+
+            } catch (error) {
+                 console.error('Auth error:', error);
+                 authError.textContent = error.message || 'An unexpected error occurred.';
+                 enableElement(authSubmitBtn);
+            }
+        };
+
+        const handleLogout = async () => {
+             if (!supabase) return;
+             const { error } = await supabase.auth.signOut();
+             if (error) {
+                 console.error("Error logging out:", error);
+                 alert("Error logging out. Please try again.");
+             } else {
+                 currentUser = null;
+                 userProfile = null;
+                 unsubscribeFromGame();
+                 unsubscribeFromGamesList();
+                 navigateTo('auth');
+                 // Reset auth form appearance
+                 authTitle.textContent = 'Login to HoopsLink';
+                 authSubmitBtn.textContent = 'Login';
+                 authToggleText.textContent = "Don't have an account?";
+                 authToggleBtn.textContent = 'Sign Up';
+                 hideElement(usernameField);
+                 authForm.reset(); // Clear form fields
+                 console.log("User logged out.");
+             }
+         };
+
+        const toggleAuthMode = () => {
+            const isSignUp = authSubmitBtn.textContent === 'Sign Up';
+            if (isSignUp) {
+                // Switch to Login
+                authTitle.textContent = 'Login to HoopsLink';
+                authSubmitBtn.textContent = 'Login';
+                authToggleText.textContent = "Don't have an account?";
+                authToggleBtn.textContent = 'Sign Up';
+                hideElement(usernameField);
+            } else {
+                // Switch to Sign Up
+                authTitle.textContent = 'Sign Up for HoopsLink';
+                authSubmitBtn.textContent = 'Sign Up';
+                authToggleText.textContent = 'Already have an account?';
+                authToggleBtn.textContent = 'Login';
+                showElement(usernameField);
+            }
+            authError.textContent = ''; // Clear errors on toggle
+            authForm.reset();
+        };
+
+        const checkUserSession = async () => {
+             if (!supabase) {
+                  navigateTo('auth'); // Can't check session if supabase isn't configured
+                  hideElement(screens.loading);
+                  return;
+             }
+             try {
+                 const { data: { session }, error } = await supabase.auth.getSession();
+
+                 if (error) {
+                      console.error("Error getting session:", error);
+                      navigateTo('auth');
+                 } else if (session && session.user) {
+                      currentUser = session.user;
+                      console.log("User session found:", currentUser.id);
+                       // Session exists, now fetch the user's profile
+                       userProfile = await getUserProfile(currentUser.id);
+                       if (!userProfile) {
+                            // This case might happen if profile creation failed after signup,
+                            // or if the profile was deleted somehow.
+                            console.warn("User session exists, but profile not found for user:", currentUser.id);
+                            // Options: Force logout, navigate to a profile creation screen, or allow limited access.
+                            // For now, let's navigate to main but warn. Some features might break.
+                            alert("Could not load your profile data. Some features might be limited. Please check your profile page.");
+                            navigateTo('main');
+                            fetchGames();
+                       } else {
+                            console.log("User profile loaded:", userProfile.username);
+                            navigateTo('main');
+                            fetchGames();
+                       }
+                 } else {
+                      console.log("No active user session found.");
+                      navigateTo('auth');
+                 }
+             } catch (err) {
+                 console.error("Unexpected error checking session:", err);
+                 navigateTo('auth');
+             } finally {
+                  // Hide loading screen once session check is complete
+                  hideElement(screens.loading);
+             }
+         };
+
+
+        // --- EVENT HANDLERS ---
+
+        function handleGameItemClick(gameId) {
+            console.log("Clicked game:", gameId);
+            currentGameId = gameId;
+            navigateTo('detail');
+            fetchGameDetails(gameId);
+        }
+
+        function handleCreateGameSubmit(event) {
+             event.preventDefault();
+             const location = document.getElementById('game-location').value;
+             const dateTime = document.getElementById('game-datetime').value;
+             createGameError.textContent = '';
+             disableElement(event.target.querySelector('button[type="submit"]'));
+
+             createGame(location, dateTime).then(({ data, error }) => {
+                  enableElement(event.target.querySelector('button[type="submit"]'));
+                  if (error) {
+                       createGameError.textContent = error.message;
+                  } else {
+                       console.log("Game created:", data);
+                       toggleCreateGameModal(false); // Close modal
+                       // Navigate to the new game's detail screen? Or just refresh list?
+                       // Refreshing list is simpler as it uses existing flow.
+                       //navigateTo('detail'); fetchGameDetails(data.id); // Option 1
+                       fetchGames(); // Option 2: Refresh main list (new game appears)
+                        // Let's refresh the list for consistency
+                  }
+             });
+        }
+
+        function handleJoinLeaveClick() {
+             if (!currentGameId) return;
+             const action = joinLeaveGameBtn.textContent;
+             if (action === 'Join Game') {
+                 joinGame(currentGameId);
+             } else if (action === 'Leave Game') {
+                  if (confirm("Are you sure you want to leave this game?")) {
+                       leaveGame(currentGameId);
+                  }
+             }
+        }
+
+         function handleBeginGameClick() {
+             if (!currentGameId) return;
+              // Add confirmation? "Ready to start the game with X players?"
+             if (confirm(`Ready to start the game with ${currentGameData?.players?.length || 0} players? This will randomize teams.`)) {
+                   beginGame(currentGameId);
+             }
+         }
+
+         function handleCancelGameClick() {
+              if (!currentGameId) return;
+              cancelGame(currentGameId); // Confirmation is inside cancelGame function
+         }
+
+         function handleScoreClick(event) {
+              if (!event.target.classList.contains('score')) return;
+              const team = event.target.dataset.team; // 'A' or 'B'
+              proposeScore(team);
+         }
+
+         function handleProfileUpdate(event) {
+             event.preventDefault();
+             const newUsername = editProfileUsernameInput.value.trim();
+             profileUpdateError.textContent = '';
+             profileUpdateMessage.textContent = '';
+
+             if (!newUsername || newUsername.length < 3) {
+                 profileUpdateError.textContent = "Username must be at least 3 characters.";
+                 return;
+             }
+             if (newUsername === userProfile.username) {
+                 // No change, just toggle back
+                 toggleProfileEdit(false);
+                 return;
+             }
+
+             disableElement(saveProfileBtn);
+
+             updateUserProfile(currentUser.id, { username: newUsername })
+                 .then(({ data, error }) => {
+                     enableElement(saveProfileBtn);
+                     if (error) {
+                          console.error("Profile update error:", error);
+                          profileUpdateError.textContent = error.message;
+                     } else {
+                          userProfile = data; // Update local cache
+                          renderProfile(userProfile); // Re-render with new data
+                          profileUpdateMessage.textContent = "Profile updated successfully!";
+                          toggleProfileEdit(false); // Hide input, show text
+                          setTimeout(() => profileUpdateMessage.textContent = '', 3000);
+                     }
+                 });
+         }
+
+        function handleSendChat(event) {
+             event.preventDefault(); // Prevent form submission if it's in a form
+             const message = chatInput.value;
+             sendChatMessage(message);
+         }
+
+        // --- UI TOGGLES AND HELPERS ---
+
+        function toggleCreateGameModal(show) {
+            if (show) {
+                createGameModal.classList.add('visible');
+                // Optional: Focus first input
+                 document.getElementById('game-location').focus();
+            } else {
+                 createGameModal.classList.remove('visible');
+                 createGameForm.reset(); // Clear form on close
+                 createGameError.textContent = '';
+            }
+        }
+
+         function toggleProfileEdit(editing) {
+             if (editing) {
+                 hideElement(profileUsername);
+                 hideElement(editProfileBtn);
+                 showElement(editProfileUsernameInput);
+                 showElement(saveProfileBtn);
+                 editProfileUsernameInput.focus();
+             } else {
+                 showElement(profileUsername);
+                 showElement(editProfileBtn);
+                 hideElement(editProfileUsernameInput);
+                 hideElement(saveProfileBtn);
+                 profileUpdateError.textContent = ''; // Clear errors
+             }
+         }
+
+        function toggleChatDrawer(open) {
+             if (open) {
+                  chatDrawer.classList.add('open');
+                  scrollToChatBottom(); // Scroll down when opening
+             } else {
+                  chatDrawer.classList.remove('open');
+             }
+         }
+
+         function scrollToChatBottom() {
+              // Use requestAnimationFrame for smoother scroll after render
+              requestAnimationFrame(() => {
+                  chatMessages.scrollTop = chatMessages.scrollHeight;
+              });
+         }
+
+         function showShareModal(textToShare, urlToShare) {
+             const defaultUrl = window.location.href; // Fallback URL
+             const url = urlToShare || defaultUrl;
+             const text = textToShare || "Check out this game on HoopsLink!";
+
+             shareLinkInput.value = url; // Show the URL to copy
+
+             if (navigator.share) {
+                  showElement(webShareApiBtn);
+                  webShareApiBtn.onclick = async () => {
+                       try {
+                           await navigator.share({
+                               title: 'HoopsLink Game',
+                               text: text,
+                               url: url,
+                           });
+                           console.log('Successful share');
+                           toggleShareModal(false); // Close modal on successful share
+                       } catch (error) {
+                           console.error('Error sharing:', error);
+                           // Hide the Web Share button if it fails (e.g., user cancels)
+                           // hideElement(webShareApiBtn);
+                           // Let user use copy fallback
+                       }
+                  };
+             } else {
+                  hideElement(webShareApiBtn); // Hide if Web Share API not supported
+             }
+
+             shareModal.classList.add('visible');
+         }
+
+          function toggleShareModal(show) {
+              if (show) {
+                   // showShareModal would have already been called
+              } else {
+                   shareModal.classList.remove('visible');
+              }
+          }
+
+          function copyShareLink() {
+              shareLinkInput.select();
+              shareLinkInput.setSelectionRange(0, 99999); // For mobile devices
+              try {
+                  document.execCommand('copy');
+                  copyShareLinkBtn.textContent = 'Copied!';
+                  setTimeout(() => { copyShareLinkBtn.textContent = 'Copy Link'; }, 2000);
+              } catch (err) {
+                   console.error('Failed to copy link: ', err);
+                   copyShareLinkBtn.textContent = 'Copy Failed';
+                   setTimeout(() => { copyShareLinkBtn.textContent = 'Copy Link'; }, 2000);
+              }
+          }
+
+         // --- CONFETTI LOGIC ---
+         let confettiInterval = null;
+         function startConfetti() {
+             stopConfetti(); // Clear existing interval
+             confettiContainer.innerHTML = ''; // Clear old confetti
+
+             const colors = [varToString('--primary-color'), varToString('--secondary-color'), varToString('--accent-color'), '#FFFFFF']; // Add white
+
+             confettiInterval = setInterval(() => {
+                 if (currentScreen !== 'end') { // Stop if navigated away
+                       stopConfetti();
+                       return;
+                 }
+                  const confetti = document.createElement('div');
+                  confetti.classList.add('confetti');
+                  confetti.style.left = `${Math.random() * 100}vw`;
+                  confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                  confetti.style.animationDuration = `${Math.random() * 2 + 3}s`; // Random duration
+                  confetti.style.opacity = `${Math.random() * 0.5 + 0.5}`;
+                  confetti.style.transform = `scale(${Math.random() * 0.5 + 0.5})`;
+
+                  confettiContainer.appendChild(confetti);
+
+                  // Remove confetti element after animation ends
+                  confetti.addEventListener('animationend', () => {
+                      confetti.remove();
+                  });
+             }, 100); // Create new confetti every 100ms
+         }
+
+         function stopConfetti() {
+             clearInterval(confettiInterval);
+             confettiInterval = null;
+            // Don't clear innerHTML here, let existing ones finish falling.
+         }
+
+          // Helper to get CSS variable string value
+          function varToString(varName) {
+              return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+          }
+
+
+        // --- INITIALIZATION ---
+        function initApp() {
+             console.log("Initializing HoopsLink App...");
+
+             // Check Supabase config first
+             if (!supabase) {
+                 console.error("Supabase client not initialized. Check URL and Key.");
+                 hideElement(screens.loading);
+                 // Display a permanent error message on the auth screen?
+                 authError.textContent = "Application configuration error. Supabase connection failed.";
+                 navigateTo('auth'); // Show auth screen, but it won't work
+                 return; // Stop further initialization
+             }
+
+             // --- Global Event Listeners ---
+             authForm.addEventListener('submit', handleAuth);
+             authToggleBtn.addEventListener('click', toggleAuthMode);
+             logoutBtn.addEventListener('click', handleLogout);
+             createGameFab.addEventListener('click', () => toggleCreateGameModal(true));
+             createGameForm.addEventListener('submit', handleCreateGameSubmit);
+             joinLeaveGameBtn.addEventListener('click', handleJoinLeaveClick);
+             beginGameBtn.addEventListener('click', handleBeginGameClick);
+             cancelGameBtn.addEventListener('click', handleCancelGameClick);
+             shareGameBtn.addEventListener('click', () => {
+                  if (currentGameData) {
+                      const shareText = `Join my basketball game "${currentGameData.location_name}" on HoopsLink!`;
+                       // Generate a shareable link (could be more specific in a real app)
+                       const shareUrl = window.location.href; // Simple URL share for now
+                       showShareModal(shareText, shareUrl);
+                  }
+             });
+              activeGameContent.addEventListener('click', handleScoreClick); // Listen on container
+              confirmScoreBtn.addEventListener('click', confirmScoreProposal);
+              rejectScoreBtn.addEventListener('click', rejectScoreProposal);
+              profileNavBtn.addEventListener('click', () => {
+                  navigateTo('profile');
+                  fetchProfileData(currentUser.id); // Load current user's profile
+              });
+              leaderboardNavBtn.addEventListener('click', () => {
+                  navigateTo('leaderboard');
+                  loadLeaderboardScreen();
+              });
+             editProfileBtn.addEventListener('click', () => toggleProfileEdit(true));
+             saveProfileBtn.addEventListener('click', handleProfileUpdate); // Use click for button, not form submit
+
+              // Back Button Navigation (Generalized)
+              backBtns.forEach(btn => {
+                  btn.addEventListener('click', () => {
+                      // Determine where to go back to based on current screen
+                       if (currentScreen === 'detail' || currentScreen === 'leaderboard' || currentScreen === 'profile') {
+                            navigateTo('main');
+                            // Optionally refresh main screen data if coming from profile/leaderboard
+                            if (currentScreen !== 'detail') fetchGames();
+                       } else {
+                            // Default back action if needed (e.g., from active game?)
+                             navigateTo('main'); // Fallback to main screen
+                             fetchGames();
+                       }
+                  });
+              });
+
+             // Chat Listeners
+             toggleChatBtn.addEventListener('click', () => toggleChatDrawer(true));
+             activeGameToggleChatBtn.addEventListener('click', () => toggleChatDrawer(true));
+             closeChatBtn.addEventListener('click', () => toggleChatDrawer(false));
+             sendChatBtn.addEventListener('click', handleSendChat);
+             chatInput.addEventListener('keypress', (e) => { // Send on Enter key
+                 if (e.key === 'Enter' && !e.shiftKey) { // Prevent Enter from adding newline
+                     e.preventDefault();
+                     handleSendChat(e);
+                 }
+             });
+
+             // Share Modal listeners
+              copyShareLinkBtn.addEventListener('click', copyShareLink);
+
+
+             // Listen for auth state changes (e.g., token refresh, background logout)
+             supabase.auth.onAuthStateChange((event, session) => {
+                 console.log('Auth State Change:', event, session);
+                 const previousUserId = currentUser?.id;
+                 currentUser = session?.user ?? null;
+
+                 if (event === 'SIGNED_IN' && !userProfile) {
+                      // User just signed in, make sure profile is loaded
+                       console.log("Signed in, checking/loading profile...");
+                       getUserProfile(currentUser.id).then(profile => {
+                           userProfile = profile;
+                           if (currentScreen === 'auth') { // Only navigate if still on auth screen
+                                navigateTo('main');
+                                fetchGames();
+                           } else {
+                                // Maybe refresh current screen if needed?
+                           }
+                       });
+                 } else if (event === 'SIGNED_OUT') {
+                      userProfile = null;
+                       if (currentScreen !== 'auth') { // Avoid navigating if already manually logged out
+                           handleLogout(); // Trigger full logout flow
+                       }
+                 } else if (event === 'USER_UPDATED') {
+                      // Handle email change confirmation, password recovery etc. if needed
+                       console.log("User data updated in Supabase Auth.");
+                 } else if (event === 'TOKEN_REFRESHED' && !currentUser) {
+                      // Sometimes a token refresh might happen before initial session load is fully complete
+                      // Re-check session state if user seems missing after refresh
+                       console.warn("Token refreshed but currentUser is null, re-checking session.");
+                       checkUserSession();
+                 }
+
+                  // If user ID changes (e.g., logout/login as different user), reset critical state
+                  if (currentUser?.id !== previousUserId) {
+                       console.log("User ID changed, resetting game state.");
+                       unsubscribeFromGame();
+                       unsubscribeFromGamesList();
+                       currentGameId = null;
+                       currentGameData = null;
+                       closeChatDrawer();
+                       // Navigate appropriately based on new state (handled by SIGNED_IN/SIGNED_OUT typically)
+                  }
+             });
+
+             // Initial check for user session
+             checkUserSession();
+
+        }
+
+        // --- START THE APP ---
+        // Ensure DOM is ready before initializing
+        document.addEventListener('DOMContentLoaded', initApp);
+
+    </script>
+</body>
+</html>
