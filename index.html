@@ -860,6 +860,18 @@
     }
     #share-link-input { margin-top: 1rem; }
   </style>
+  <!--
+    IMPORTANT: To fix the error "new row violates row-level security policy for table 'profiles'",
+    go to your Supabase dashboard, navigate to the 'profiles' table, and add a policy that allows
+    authenticated users to insert a new row if auth.uid() equals the NEW.user_id.
+    For example, create a policy with:
+    
+    Policy Name: Allow insert for authenticated users
+    For: INSERT
+    Using expression: auth.uid() = NEW.user_id
+    
+    Save the policy, and then try signing up again.
+  -->
 </head>
 <body>
   <div id="app-container">
@@ -1110,8 +1122,8 @@
   <script>
     // --- SUPABASE CLIENT SETUP ---
     // IMPORTANT: Replace with your actual Supabase URL and Anon Key
-    const SUPABASE_URL = 'https://aghnqhwhpiwndronbgkd.supabase.co'; // <- Replace this
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFnaG5xaHdocGl3bmRyb25iZ2tkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM5MDM4NTMsImV4cCI6MjA1OTQ3OTg1M30.jwYaXa_nb5HXQHjA3Bt6NUxYwQPDTawzNJvkOtI4Y1Q'; // <- Replace this
+    const SUPABASE_URL = 'https://aghnqhwhpiwndronbgkd.supabase.co'; // Your Supabase URL
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFnaG5xaHdocGl3bmRyb25iZ2tkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM5MDM4NTMsImV4cCI6MjA1OTQ3OTg1M30.jwYaXa_nb5HXQHjA3Bt6NUxYwQPDTawzNJvkOtI4Y1Q'; // Your Supabase Anon Key
 
     let client = null;
     if (SUPABASE_URL && SUPABASE_ANON_KEY && SUPABASE_URL !== 'YOUR_SUPABASE_URL') {
