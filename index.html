@@ -34,40 +34,39 @@
     }
 
     html, body {
-      height: 100%;
+      min-height: 100%;
       font-family: var(--font-family);
       background-color: var(--background-color);
       color: var(--text-color);
-      overflow: hidden;
       font-size: 16px;
+      margin: 0;
+      /* Allow vertical scrolling */
+      overflow-x: hidden;
     }
 
     body {
       display: flex;
       justify-content: center;
-      align-items: center;
+      align-items: flex-start;
+      padding: 20px;
     }
 
+    /* Updated container style for website layout */
     #app-container {
       width: 100%;
-      height: 100%;
-      max-width: 450px; /* Mobile-first approach */
+      max-width: 1200px;
+      margin: 20px auto;
       background: linear-gradient(135deg, #1a1a1a 0%, #111 100%);
-      border-radius: 0;
+      border-radius: var(--border-radius);
       box-shadow: var(--box-shadow);
       display: flex;
       flex-direction: column;
-      overflow: hidden;
+      overflow: visible;
       position: relative;
     }
 
-    @media (min-width: 451px) {
-      #app-container {
-        max-width: 400px;
-        max-height: 850px;
-        border-radius: var(--border-radius);
-        margin: 20px;
-      }
+    /* Updated media query for larger screens */
+    @media (min-width: 768px) {
       body {
         background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
       }
@@ -400,11 +399,6 @@
       animation: slideInUp 0.5s var(--transition-effect) backwards;
       opacity: 0;
     }
-    @for $i from 1 through 20 {
-      .game-list-item:nth-child(#{$i}) {
-        animation-delay: #{$i * 0.05}s;
-      }
-    }
     @keyframes slideInUp {
       from { transform: translateY(50px); opacity: 0; }
       to { transform: translateY(0); opacity: 1; }
@@ -713,11 +707,6 @@
     .leaderboard-item:hover {
       transform: scale(1.03);
     }
-    @for $i from 1 through 50 {
-      .leaderboard-item:nth-child(#{$i}) {
-        animation-delay: #{$i * 0.05}s;
-      }
-    }
     .leaderboard-rank {
       font-size: 1.2rem;
       font-weight: bold;
@@ -860,18 +849,6 @@
     }
     #share-link-input { margin-top: 1rem; }
   </style>
-  <!--
-    IMPORTANT: To fix the error "new row violates row-level security policy for table 'profiles'",
-    go to your Supabase dashboard, navigate to the 'profiles' table, and add a policy that allows
-    authenticated users to insert a new row if auth.uid() equals the NEW.user_id.
-    For example, create a policy with:
-    
-    Policy Name: Allow insert for authenticated users
-    For: INSERT
-    Using expression: auth.uid() = NEW.user_id
-    
-    Save the policy, and then try signing up again.
-  -->
 </head>
 <body>
   <div id="app-container">
@@ -1122,8 +1099,8 @@
   <script>
     // --- SUPABASE CLIENT SETUP ---
     // IMPORTANT: Replace with your actual Supabase URL and Anon Key
-    const SUPABASE_URL = 'https://aghnqhwhpiwndronbgkd.supabase.co'; // Your Supabase URL
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFnaG5xaHdocGl3bmRyb25iZ2tkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM5MDM4NTMsImV4cCI6MjA1OTQ3OTg1M30.jwYaXa_nb5HXQHjA3Bt6NUxYwQPDTawzNJvkOtI4Y1Q'; // Your Supabase Anon Key
+    const SUPABASE_URL = 'https://aghnqhwhpiwndronbgkd.supabase.co'; // <- Replace this
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFnaG5xaHdocGl3bmRyb25iZ2tkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM5MDM4NTMsImV4cCI6MjA1OTQ3OTg1M30.jwYaXa_nb5HXQHjA3Bt6NUxYwQPDTawzNJvkOtI4Y1Q'; // <- Replace this
 
     let client = null;
     if (SUPABASE_URL && SUPABASE_ANON_KEY && SUPABASE_URL !== 'YOUR_SUPABASE_URL') {
@@ -1281,6 +1258,11 @@
     const hideElement = (el) => el.classList.add('hidden');
     const enableElement = (el) => el.disabled = false;
     const disableElement = (el) => el.disabled = true;
+
+    // --- Added missing closeChatDrawer function ---
+    function closeChatDrawer() {
+      toggleChatDrawer(false);
+    }
 
     const navigateTo = (screenName) => {
       if (!screens[screenName]) {
