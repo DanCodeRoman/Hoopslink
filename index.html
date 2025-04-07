@@ -40,8 +40,7 @@
         body {
             min-height: 100%; /* Ensure body takes full height */
             font-family: var(--font-family);
-            /* CHANGED: Website background to black */
-            background-color: #000000;
+            background-color: #000000; /* Website background black */
             color: var(--text-color);
             display: flex;
             justify-content: center;
@@ -66,14 +65,12 @@
 
         #app-container {
             width: 100%;
-            /* Max width for larger screens, becomes viewport width on smaller */
             max-width: 900px;
-            /* Allow height to grow based on content, add min-height */
             min-height: 600px;
-            height: auto; /* Remove fixed height */
-            max-height: 95vh; /* Prevent it from exceeding viewport height significantly */
+            height: auto; /* Allow height to grow */
+            max-height: 95vh; /* Limit height */
             background: linear-gradient(135deg, #1a1a1a 0%, #111 100%);
-            border-radius: var(--border-radius); /* Always have border radius */
+            border-radius: var(--border-radius);
             box-shadow: var(--box-shadow);
             display: flex;
             flex-direction: column;
@@ -124,7 +121,6 @@
             align-items: center;
             z-index: 100;
         }
-         /* CHANGED: Loading screen logo to white */
          #loading-screen h1.logo {
              font-size: 3rem;
              font-weight: 900;
@@ -278,10 +274,9 @@
         h1 {
             font-size: 2.5rem;
             line-height: 1.1;
-            /* CHANGED: Made H1 white */
-            color: #FFFFFF;
+            color: #FFFFFF; /* Made H1 white */
             font-weight: 900;
-            background: none; /* Remove gradient */
+            background: none;
             -webkit-background-clip: unset;
         }
         h2 { font-size: 1.8rem; color: var(--primary-color); }
@@ -310,15 +305,13 @@
             border-top-right-radius: var(--border-radius);
         }
 
-        /* CHANGED: Logo color to white */
         .app-header .logo {
             font-size: 1.5rem;
             font-weight: 900;
-            color: #FFFFFF; /* White color */
-            background: none; /* Remove gradient */
+            color: #FFFFFF; /* Logo color white */
+            background: none;
             -webkit-background-clip: unset;
             cursor: pointer;
-            /* animation: pulse-logo 5s infinite ease-in-out; */ /* Removed pulse for simplicity */
         }
 
 
@@ -458,6 +451,8 @@
         .status-pending { background-color: var(--primary-color); color: var(--text-color-dark); }
         .status-active { background-color: var(--success-color); color: var(--text-color-dark); }
         .status-finished { background-color: var(--secondary-color); color: var(--text-color); }
+        .status-cancelled { background-color: var(--error-color); color: var(--text-color); } /* Added cancelled */
+
 
         #create-game-fab {
             position: absolute;
@@ -483,7 +478,7 @@
 
         /* Create Game Modal */
         #create-game-modal {
-            position: fixed;
+            position: fixed; /* Changed to fixed for better overlay */
             top: 0;
             left: 0;
             width: 100%;
@@ -522,7 +517,6 @@
             padding: 1.5rem;
         }
         #game-detail-header h2 {
-            /* Use non-gradient color if main logo changed */
              color: var(--primary-color);
              background: none;
              -webkit-background-clip: unset;
@@ -562,6 +556,19 @@
         #active-game-screen {
             background: linear-gradient(180deg, #222 0%, var(--background-color) 80%);
         }
+        #active-game-screen .app-header { /* Allow space for timer */
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        #game-timer {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--accent-color);
+            padding: 0 1rem; /* Adjust padding */
+            min-width: 70px; /* Ensure space */
+            text-align: center;
+        }
         .scoreboard {
             display: flex;
             justify-content: space-around;
@@ -579,7 +586,7 @@
             font-weight: 900;
             line-height: 1;
             transition: transform 0.3s ease, color 0.3s ease;
-            cursor: pointer;
+            cursor: pointer; /* Keep cursor to indicate clickability */
         }
         .score:hover { transform: scale(1.1); }
         #team-a-score { color: var(--primary-color); }
@@ -697,7 +704,6 @@
             margin: 0 auto 1rem auto; display: flex; justify-content: center; align-items: center;
             font-size: 4rem; font-weight: bold; color: var(--text-color);
             box-shadow: 0 0 20px rgba(255, 107, 0, 0.5);
-             /* Add comment for image upload */
              /* In a real app, add an upload icon/button here */
         }
         #profile-username-display { display: inline-block; margin-bottom: 0.5rem; }
@@ -886,6 +892,8 @@
         <div id="active-game-screen" class="screen flex-col">
             <header class="app-header">
                 <div class="logo" style="font-size: 1.2rem;">Active Game</div>
+                <!-- ADDED Game Timer Display -->
+                <div id="game-timer">--:--</div>
                 <button id="active-game-toggle-chat-btn" class="btn-outline" style="padding: 5px 10px; font-size: 0.9rem;">Chat</button>
             </header>
             <div class="content-area">
@@ -1016,7 +1024,7 @@
             <header class="app-header">
                 <button class="back-btn" style="background:none; border:none; font-size: 1.5rem; color: var(--accent-color); cursor:pointer;">&lt;</button>
                 <div class="logo">Leaderboard</div>
-                 <div class="header-actions"> <!-- Move chat toggle here for consistency? -->
+                 <div class="header-actions"> <!-- Optional: Move chat toggle here -->
                      <button id="leaderboard-chat-toggle" title="Chat (Global/Local?)" class="hidden"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M800-80v-640q0-33-23.5-56.5T720-799H240q-33 0-56.5 23.5T160-720v480q0 33 23.5 56.5T240-160h400l160 160v-80Zm-80-80H240v-480h480v480Zm-40-140H280v-80h360v80Zm0-120H280v-80h360v80Z"/></svg></button>
                  </div>
             </header>
@@ -1091,10 +1099,8 @@
         const SUPABASE_URL = 'https://aghnqhwhpiwndronbgkd.supabase.co'; // <- Replace this
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFnaG5xaHdocGl3bmRyb25iZ2tkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM5MDM4NTMsImV4cCI6MjA1OTQ3OTg1M30.jwYaXa_nb5HXQHjA3Bt6NUxYwQPDTawzNJvkOtI4Y1Q'; // <- Replace this
 
-        // Use 'supabase' variable to hold the client instance
         let supabase = null;
 
-        // Check if the Supabase library loaded correctly onto the window object
         if (typeof window.supabase !== 'undefined' && typeof window.supabase.createClient === 'function') {
             if (SUPABASE_URL && SUPABASE_ANON_KEY && SUPABASE_URL !== 'YOUR_SUPABASE_URL') {
                 try {
@@ -1114,13 +1120,20 @@
         let gamesSubscription = null;
         let scoreProposals = {};
         let currentScoreProposal = null;
-        let confirmingScore = false;
-        let leaderboardScope = 'global'; // 'global', 'country', 'state', 'city'
-        let leaderboardFilterValue = null; // e.g., 'USA', 'CA', 'New York'
+        let confirmingScore = false; // Prevents double clicks during confirmation
+        let leaderboardScope = 'global';
+        let leaderboardFilterValue = null;
+        let gameTimerInterval = null; // For active game timer
+
+        // --- CONSTANTS ---
+        const GAME_DURATION_MINUTES = 10; // Default game length
+        const SCORE_LIMIT = 11; // Score needed to win (unless time runs out)
+        const MIN_PLAYERS_TO_START = 4; // Minimum players required to begin a game
 
         // --- UI ELEMENTS CACHE (Add new elements) ---
         const screens = { loading: document.getElementById('loading-screen'), auth: document.getElementById('auth-screen'), main: document.getElementById('main-app-screen'), detail: document.getElementById('game-detail-screen'), active: document.getElementById('active-game-screen'), end: document.getElementById('game-end-screen'), profile: document.getElementById('profile-screen'), leaderboard: document.getElementById('leaderboard-screen'), };
         const authForm = document.getElementById('auth-form'); const authTitle = document.getElementById('auth-title'); const authSubmitBtn = document.getElementById('auth-submit-btn'); const authToggleBtn = document.getElementById('auth-toggle-btn'); const authToggleText = document.getElementById('auth-toggle-text'); const usernameField = document.getElementById('username-field'); const usernameInput = document.getElementById('username'); const emailInput = document.getElementById('email'); const passwordInput = document.getElementById('password'); const authError = document.getElementById('auth-error'); const logoutBtn = document.getElementById('logout-btn'); const gameList = document.getElementById('game-list'); const gameListLoader = document.getElementById('game-list-loader'); const noGamesMessage = document.getElementById('no-games-message'); const createGameFab = document.getElementById('create-game-fab'); const createGameModal = document.getElementById('create-game-modal'); const createGameForm = document.getElementById('create-game-form'); const createGameError = document.getElementById('create-game-error'); const gameDetailLoader = document.getElementById('game-detail-loader'); const gameDetailContent = document.getElementById('game-detail-content'); const gameDetailLocation = document.getElementById('game-detail-location'); const gameDetailDatetime = document.getElementById('game-detail-datetime'); const gameDetailCreator = document.getElementById('game-detail-creator'); const gameDetailStatus = document.getElementById('game-detail-status').querySelector('.status-indicator'); const playerCount = document.getElementById('player-count'); const maxPlayers = document.getElementById('max-players'); const playerList = document.getElementById('player-list'); const joinLeaveGameBtn = document.getElementById('join-leave-game-btn'); const beginGameBtn = document.getElementById('begin-game-btn'); const cancelGameBtn = document.getElementById('cancel-game-btn'); const shareGameBtn = document.getElementById('share-game-btn'); const gameDetailError = document.getElementById('game-detail-error'); const activeGameLoader = document.getElementById('active-game-loader'); const activeGameContent = document.getElementById('active-game-content'); const teamAScore = document.getElementById('team-a-score'); const teamBScore = document.getElementById('team-b-score'); const teamAList = document.getElementById('team-a-list'); const teamBList = document.getElementById('team-b-list'); const scoreProposalMessage = document.getElementById('score-proposal-message'); const scoreErrorMessage = document.getElementById('score-error-message'); const scoreConfirmationModal = document.getElementById('score-confirmation-modal'); const scoreConfirmText = document.getElementById('score-confirm-text'); const confirmScoreBtn = document.getElementById('confirm-score-btn'); const rejectScoreBtn = document.getElementById('reject-score-btn'); const gameEndScreen = document.getElementById('game-end-screen'); const gameEndTitle = document.getElementById('game-end-title'); const finalScore = document.getElementById('final-score'); const mvpUsername = document.getElementById('mvp-username'); const mvpScore = document.getElementById('mvp-score'); const mvpHighlight = document.getElementById('mvp-highlight'); const confettiContainer = document.getElementById('confetti-container'); const backToMainBtn = document.getElementById('back-to-main-btn'); const viewLeaderboardBtn = document.getElementById('view-leaderboard-btn'); const shareResultsBtn = document.getElementById('share-results-btn'); const profileLoader = document.getElementById('profile-loader'); const profileContent = document.getElementById('profile-content'); const profileAvatar = document.getElementById('profile-avatar'); const profileUsernameDisplay = document.getElementById('profile-username-display'); const profileUsername = document.getElementById('profile-username'); const profileEmail = document.getElementById('profile-email'); const editProfileBtn = document.getElementById('edit-profile-btn'); const saveProfileBtn = document.getElementById('save-profile-btn'); const profileEditFields = document.getElementById('profile-edit-fields'); const editProfileUsernameInput = document.getElementById('edit-profile-username-input'); const editProfileCityInput = document.getElementById('edit-profile-city'); const editProfileStateInput = document.getElementById('edit-profile-state'); const editProfileCountryInput = document.getElementById('edit-profile-country'); const profileUpdateMessage = document.getElementById('profile-update-message'); const profileUpdateError = document.getElementById('profile-update-error'); const profileStatPoints = document.getElementById('profile-stat-points'); const profileStatGames = document.getElementById('profile-stat-games'); const profileStatMvp = document.getElementById('profile-stat-mvp'); const gameHistoryLoader = document.getElementById('game-history-loader'); const gameHistoryList = document.getElementById('game-history-list'); const noHistoryMessage = document.getElementById('no-history-message'); const leaderboardLoader = document.getElementById('leaderboard-loader'); const leaderboardListContainer = document.getElementById('leaderboard-list-container'); const leaderboardList = document.getElementById('leaderboard-list'); const noLeaderboardMessage = document.getElementById('no-leaderboard-message'); const leaderboardFilters = document.getElementById('leaderboard-filters'); const leaderboardStatus = document.getElementById('leaderboard-status'); const profileNavBtn = document.getElementById('profile-nav-btn'); const leaderboardNavBtn = document.getElementById('leaderboard-nav-btn'); const backBtns = document.querySelectorAll('.back-btn'); const chatDrawer = document.getElementById('chat-drawer'); const chatMessages = document.getElementById('chat-messages'); const chatInput = document.getElementById('chat-input'); const sendChatBtn = document.getElementById('send-chat-btn'); const closeChatBtn = document.getElementById('close-chat-btn'); const toggleChatBtn = document.getElementById('toggle-chat-btn'); const activeGameToggleChatBtn = document.getElementById('active-game-toggle-chat-btn'); const shareModal = document.getElementById('share-modal'); const shareLinkInput = document.getElementById('share-link-input'); const copyShareLinkBtn = document.getElementById('copy-share-link-btn'); const webShareApiBtn = document.getElementById('web-share-api-btn');
+        const gameTimerDisplay = document.getElementById('game-timer'); // Added Game Timer Element
 
         // --- UTILITY FUNCTIONS ---
         const debounce = (func, delay) => { let timeoutId; return (...args) => { clearTimeout(timeoutId); timeoutId = setTimeout(() => { func.apply(this, args); }, delay); }; };
@@ -1129,21 +1142,50 @@
 
         const navigateTo = (screenName) => {
              if (!screens[screenName]) { console.error("Unknown screen:", screenName); return; }
-             console.log(`Navigating to ${screenName}`); Object.values(screens).forEach(s => s.classList.remove('active')); screens[screenName].classList.add('active'); currentScreen = screenName;
-             if (screenName !== 'detail' && screenName !== 'active' && screenName !== 'end') { unsubscribeFromGame(); currentGameId = null; currentGameData = null; }
-             if (screenName !== 'main') { unsubscribeFromGamesList(); }
-             if (screenName !== 'detail' && screenName !== 'active') { toggleChatDrawer(false); }
+             console.log(`Navigating from ${currentScreen} to ${screenName}`);
+
+             // Stop timer if leaving active game screen
+             if (currentScreen === 'active' && screenName !== 'active') {
+                 stopGameTimer();
+             }
+
+             // Unsubscribe from specific game if leaving detail/active/end
+             if (['detail', 'active', 'end'].includes(currentScreen) && !['detail', 'active', 'end'].includes(screenName)) {
+                unsubscribeFromGame();
+                currentGameId = null;
+                currentGameData = null;
+             }
+             // Unsubscribe from list if leaving main
+             if (currentScreen === 'main' && screenName !== 'main') {
+                unsubscribeFromGamesList();
+             }
+             // Close chat if navigating away from game context
+             if (!['detail', 'active'].includes(screenName)) {
+                toggleChatDrawer(false);
+             }
+
+             Object.values(screens).forEach(s => s.classList.remove('active'));
+             screens[screenName].classList.add('active');
+             currentScreen = screenName;
          };
+
         const getUserAvatarText = (username) => username ? username.charAt(0).toUpperCase() : '?';
 
         const getUserProfile = async (userId) => {
              if (!supabase || !userId) return null;
              try {
-                 console.log("Fetching profile:", userId);
-                 const { data, error } = await supabase.from('profiles').select('*').eq('user_id', userId).single();
-                 if (error && error.code !== 'PGRST116') { console.error('Fetch profile error:', error); return null; }
-                 console.log("Profile fetched:", data); return data;
-             } catch (error) { console.error('Fetch profile exception:', error); return null; }
+                 // console.log("Fetching profile:", userId); // Less verbose logging
+                 const { data, error, status } = await supabase.from('profiles').select('*').eq('user_id', userId).single();
+                 if (error && status !== 406) { // 406 means no rows found, which is ok for checking existence
+                    console.error('Fetch profile error:', error);
+                    return null;
+                 }
+                 // console.log("Profile fetched:", data); // Less verbose logging
+                 return data;
+             } catch (error) {
+                 console.error('Fetch profile exception:', error);
+                 return null;
+             }
          };
         const updateUserProfile = async (userId, updates) => {
              if (!supabase || !userId) return { error: { message: 'Client/ID missing' } };
@@ -1154,83 +1196,220 @@
         const createInitialUserProfile = async (userId, email, username) => {
              if (!supabase) return { error: { message: 'Client missing' } }; console.log(`Creating profile for ${userId}, user: ${username}`);
              try {
+                 // Check if username exists first
                  const { data: existingUser, error: checkError } = await supabase.from('profiles').select('username').eq('username', username).maybeSingle();
-                 if (checkError && checkError.code !== 'PGRST116') { console.error('Username check error:', checkError); }
-                 if (existingUser) { console.warn(`Username ${username} taken.`); return { error: { message: 'Username taken.' } }; }
+                 if (checkError && checkError.code !== 'PGRST116') { // PGRST116 means 0 rows, expected if username is free
+                    console.error('Username check error:', checkError);
+                    // Allow creation attempt even if check fails, insert might handle uniqueness
+                 }
+                 if (existingUser) {
+                     console.warn(`Username ${username} taken.`);
+                     return { error: { message: 'Username already taken. Please choose another.' } };
+                 }
+
+                 // Insert new profile
                  const { data, error } = await supabase.from('profiles').insert({ user_id: userId, email: email, username: username }).select().single();
-                 if (error) { console.error('Insert profile error:', error); return { error }; }
-                 console.log(`Profile created ${userId}:`, data); return { data, error };
-             } catch (error) { console.error('Create profile exception:', error); return { error }; }
+                 if (error) {
+                     console.error('Insert profile error:', error);
+                     // Check for unique constraint violation specifically
+                     if (error.code === '23505' && error.message.includes('profiles_username_key')) {
+                        return { error: { message: 'Username already taken. Please choose another.' } };
+                     }
+                     return { error }; // Return other errors
+                 }
+                 console.log(`Profile created ${userId}:`, data);
+                 return { data, error: null }; // Ensure error is null on success
+             } catch (error) {
+                 console.error('Create profile exception:', error);
+                 return { error };
+             }
          };
 
         // --- SCREEN RENDERING FUNCTIONS ---
         const renderGameList = (games) => {
              gameList.innerHTML = ''; hideElement(gameListLoader); if (!games || games.length === 0) { showElement(noGamesMessage); return; } hideElement(noGamesMessage);
-             games.sort((a, b) => { if (a.status === 'pending' && b.status !== 'pending') return -1; if (a.status !== 'pending' && b.status === 'pending') return 1; const timeA = a.start_time ? new Date(a.start_time).getTime() : Infinity; const timeB = b.start_time ? new Date(b.start_time).getTime() : Infinity; return timeA - timeB; });
+             // Sort: pending first, then by start time
+             games.sort((a, b) => {
+                 if (a.status === 'pending' && b.status !== 'pending') return -1;
+                 if (a.status !== 'pending' && b.status === 'pending') return 1;
+                 if (a.status === 'active' && b.status !== 'active') return -1; // Active before finished/cancelled
+                 if (a.status !== 'active' && b.status === 'active') return 1;
+                 const timeA = a.start_time ? new Date(a.start_time).getTime() : Infinity;
+                 const timeB = b.start_time ? new Date(b.start_time).getTime() : Infinity;
+                 return timeA - timeB;
+             });
              games.forEach((game, index) => {
                  const li = document.createElement('li'); li.classList.add('game-list-item'); li.dataset.gameId = game.id; li.style.setProperty('--animation-order', index);
-                 const players = game.players || []; const playerCount = players.length; const maxP = 10;
-                 li.innerHTML = `<div class="game-info"><h3>${game.location_name || 'Unnamed Game'}</h3><div class="game-meta"><span>📍 ${game.location_name || 'TBD'}</span> | <span>📅 ${formatDate(game.start_time)}</span></div></div><div class="game-status-indicator status-${game.status || 'unknown'}">${game.status === 'pending' ? `${playerCount}/${maxP} Players` : game.status.charAt(0).toUpperCase() + game.status.slice(1)}</div>`;
+                 const players = game.players || []; // Players only relevant for pending
+                 const playerCount = players.length;
+                 const maxP = 10; // Max players constant?
+                 let statusText = game.status ? game.status.charAt(0).toUpperCase() + game.status.slice(1) : 'Unknown';
+                 if (game.status === 'pending') {
+                    statusText = `${playerCount}/${maxP} Players`;
+                 }
+                 li.innerHTML = `<div class="game-info"><h3>${game.location_name || 'Unnamed Game'}</h3><div class="game-meta"><span>📍 ${game.location_name || 'TBD'}</span> | <span>📅 ${formatDate(game.start_time)}</span></div></div><div class="game-status-indicator status-${game.status || 'unknown'}">${statusText}</div>`;
                  li.addEventListener('click', () => handleGameItemClick(game.id)); gameList.appendChild(li);
              });
              requestAnimationFrame(() => { document.querySelectorAll('.game-list-item').forEach(item => { item.style.opacity = '1'; item.style.transform = 'translateY(0)'; }); });
          };
         const renderGameDetail = (game) => {
-             hideElement(gameDetailLoader); if (!game) { gameDetailError.textContent = "Details load failed."; showElement(gameDetailError); hideElement(gameDetailContent); return; } showElement(gameDetailContent); hideElement(gameDetailError);
-             currentGameData = game; gameDetailLocation.textContent = game.location_name || 'Unnamed Game'; gameDetailDatetime.textContent = `📅 ${formatDate(game.start_time)}`; gameDetailCreator.textContent = `👑 Loading...`; fetchUserProfileAndSetCreator(game.creator_id);
+             hideElement(gameDetailLoader); if (!game) { gameDetailError.textContent = "Failed to load game details."; showElement(gameDetailError); hideElement(gameDetailContent); return; } showElement(gameDetailContent); hideElement(gameDetailError);
+             currentGameData = game; // Update global state
+             gameDetailLocation.textContent = game.location_name || 'Unnamed Game'; gameDetailDatetime.textContent = `📅 ${formatDate(game.start_time)}`; gameDetailCreator.textContent = `👑 Loading Creator...`; fetchUserProfileAndSetCreator(game.creator_id);
              const statusClass = `status-${game.status || 'unknown'}`; gameDetailStatus.className = `status-indicator ${statusClass}`; gameDetailStatus.textContent = game.status ? game.status.charAt(0).toUpperCase() + game.status.slice(1) : 'Unknown';
-             const players = game.players || []; playerCount.textContent = players.length; playerList.innerHTML = '';
+             const players = game.players || []; // Only pending games have 'players' field populated typically
+             playerCount.textContent = players.length;
+             maxPlayers.textContent = '10'; // Assuming fixed max players
+             playerList.innerHTML = '';
              players.forEach(player => { const li = document.createElement('li'); li.classList.add('player-list-item'); li.innerHTML = `<div class="player-avatar">${getUserAvatarText(player.username)}</div><span class="player-username">${player.username || 'Guest'}</span><span class="player-status">${player.user_id === game.creator_id ? 'Creator' : ''}</span>`; playerList.appendChild(li); });
-             updateGameDetailButtons(game); if (chatDrawer.classList.contains('open')) { renderChatMessages(game.chat_log || []); }
+             updateGameDetailButtons(game);
+             // Only show chat if game is pending or active
+             if (game.status === 'pending' || game.status === 'active') {
+                showElement(toggleChatBtn);
+                if (chatDrawer.classList.contains('open')) {
+                    renderChatMessages(game.chat_log || []);
+                }
+             } else {
+                hideElement(toggleChatBtn);
+                toggleChatDrawer(false); // Close chat if game ended/cancelled
+             }
          };
         const fetchUserProfileAndSetCreator = async (creatorId) => { const profile = await getUserProfile(creatorId); if (profile?.username) { gameDetailCreator.textContent = `👑 Created by ${profile.username}`; } else { gameDetailCreator.textContent = `👑 Creator ID: ${creatorId ? creatorId.substring(0, 8) : 'Unknown'}...`; } };
         const updateGameDetailButtons = (game) => {
              if (!currentUser || !game) return;
-             const isCreator = game.creator_id === currentUser.id; const players = game.players || []; const isPlayer = players.some(p => p.user_id === currentUser.id);
-             const MIN_PLAYERS_TO_START = 4; // CHANGED
+             const isCreator = game.creator_id === currentUser.id;
+             const players = game.players || []; // Use players array for pending games
+             const isPlayer = players.some(p => p.user_id === currentUser.id);
+
              const canJoin = players.length < 10 && !isPlayer && game.status === 'pending';
-             const canLeave = isPlayer && game.status === 'pending' && !isCreator;
-             const canBegin = isCreator && game.status === 'pending' && players.length >= MIN_PLAYERS_TO_START; // CHANGED
+             const canLeave = isPlayer && game.status === 'pending' && !isCreator; // Creator cannot leave pending game via button
+             const canBegin = isCreator && game.status === 'pending' && players.length >= MIN_PLAYERS_TO_START;
              const canCancel = isCreator && game.status === 'pending';
-             if (canJoin) { joinLeaveGameBtn.textContent = 'Join Game'; joinLeaveGameBtn.className = 'btn-primary w-full'; showElement(joinLeaveGameBtn); enableElement(joinLeaveGameBtn); }
-             else if (canLeave) { joinLeaveGameBtn.textContent = 'Leave Game'; joinLeaveGameBtn.className = 'btn-danger w-full'; showElement(joinLeaveGameBtn); enableElement(joinLeaveGameBtn); }
-             else { hideElement(joinLeaveGameBtn); }
-             if (canBegin) { showElement(beginGameBtn); enableElement(beginGameBtn); } else { hideElement(beginGameBtn); }
-             if (canCancel) { showElement(cancelGameBtn); enableElement(cancelGameBtn); } else { hideElement(cancelGameBtn); }
-             if(game.status === 'pending' || game.status === 'active') { showElement(shareGameBtn); } else { hideElement(shareGameBtn); }
+
+             // Reset all button states first
+             hideElement(joinLeaveGameBtn);
+             hideElement(beginGameBtn);
+             hideElement(cancelGameBtn);
+             hideElement(shareGameBtn);
+
+             if (game.status === 'pending') {
+                if (canJoin) { joinLeaveGameBtn.textContent = 'Join Game'; joinLeaveGameBtn.className = 'btn-primary w-full'; showElement(joinLeaveGameBtn); enableElement(joinLeaveGameBtn); }
+                else if (canLeave) { joinLeaveGameBtn.textContent = 'Leave Game'; joinLeaveGameBtn.className = 'btn-danger w-full'; showElement(joinLeaveGameBtn); enableElement(joinLeaveGameBtn); }
+                // If already joined and not creator, show nothing or maybe 'Joined'? For now, hide if cannot leave/join.
+                else if (isPlayer && !canLeave) { /* Maybe show a disabled 'Joined' button? */ }
+
+                if (canBegin) { showElement(beginGameBtn); enableElement(beginGameBtn); }
+                if (canCancel) { showElement(cancelGameBtn); enableElement(cancelGameBtn); }
+                showElement(shareGameBtn); // Allow sharing pending games
+             } else if (game.status === 'active') {
+                // No join/leave/begin/cancel buttons for active games from detail screen (user should be on active screen)
+                showElement(shareGameBtn); // Allow sharing active games
+             }
+             // No actions for finished/cancelled games on detail screen
          };
         const renderActiveGame = (game) => {
-             hideElement(activeGameLoader); if (!game || game.status !== 'active') { console.warn("Render active invalid state:", game?.status); return; } showElement(activeGameContent); currentGameData = game;
+             hideElement(activeGameLoader); if (!game || game.status !== 'active') { console.warn("Render active game called with invalid state:", game?.status); navigateTo('main'); fetchGames(); return; } showElement(activeGameContent);
+             currentGameData = game; // Update global state
              teamAScore.textContent = game.score_a || 0; teamBScore.textContent = game.score_b || 0;
-             const renderTeam = (el, teamData, name) => { el.innerHTML = `<h4>${name}</h4>`; const players = teamData || []; if (players.length === 0) { el.innerHTML += `<p style="font-size: 0.8em; color: #888; text-align: center;">No players.</p>`; } else { players.forEach(p => { const div = document.createElement('div'); div.classList.add('team-player'); div.textContent = p.username || `User ${p.user_id.substring(0,6)}`; el.appendChild(div); }); } };
-             renderTeam(teamAList, game.team_a, 'Team A'); renderTeam(teamBList, game.team_b, 'Team B'); updateScoreProposalUI(game.point_proposals);
+             const renderTeam = (el, teamData, name) => { el.innerHTML = `<h4>${name}</h4>`; const players = teamData || []; if (players.length === 0) { el.innerHTML += `<p style="font-size: 0.8em; color: #888; text-align: center;">No players assigned.</p>`; } else { players.forEach(p => { const div = document.createElement('div'); div.classList.add('team-player'); div.textContent = p.username || `User ${p.user_id.substring(0,6)}`; el.appendChild(div); }); } };
+             renderTeam(teamAList, game.team_a, 'Team A'); renderTeam(teamBList, game.team_b, 'Team B');
+             updateScoreProposalUI(game.point_proposals);
+             // Start or update the game timer
+             startGameTimer(game.game_end_time);
+             // Update chat if open
+             if (chatDrawer.classList.contains('open')) {
+                renderChatMessages(game.chat_log || []);
+             }
          };
         const renderGameEnd = (game) => {
-             if (!game) { console.error("No game data for end"); return; } hideElement(activeGameLoader); showElement(gameEndScreen);
-             const winner = game.winner; const scoreA = game.score_a || 0; const scoreB = game.score_b || 0;
-             if (winner === 'A') { gameEndTitle.textContent = 'Team A Wins!'; gameEndScreen.style.background = 'linear-gradient(180deg, var(--primary-color) 0%, #8A2BE2 100%)'; }
-             else if (winner === 'B') { gameEndTitle.textContent = 'Team B Wins!'; gameEndScreen.style.background = 'linear-gradient(180deg, var(--accent-color) 0%, var(--secondary-color) 100%)'; }
-             else { gameEndTitle.textContent = 'It\'s a Draw!'; gameEndScreen.style.background = 'linear-gradient(180deg, var(--surface-color) 0%, var(--background-color) 100%)'; }
-             finalScore.textContent = `Final Score: ${scoreA} - ${scoreB}`;
-             if(game.mvp_user_id) { const allPlayers = [...(game.team_a || []), ...(game.team_b || [])]; const mvp = allPlayers.find(p => p.user_id === game.mvp_user_id); if (mvp) { mvpUsername.textContent = mvp.username || 'Unknown'; mvpScore.textContent = `(Stats unavailable)`; showElement(mvpHighlight); } else { hideElement(mvpHighlight); } } else { hideElement(mvpHighlight); }
-             startConfetti();
-             backToMainBtn.onclick = () => { stopConfetti(); navigateTo('main'); fetchGames(); }; viewLeaderboardBtn.onclick = () => { stopConfetti(); navigateTo('leaderboard'); fetchLeaderboard('global'); }; shareResultsBtn.onclick = () => { const shareText = `Game Finished! ${game.location_name || 'Game'}: A(${scoreA})-B(${scoreB}). ${winner ? `Team ${winner} wins!`:'Draw!'}`; showShareModal(shareText, window.location.href); };
+             if (!game || !['finished', 'cancelled'].includes(game.status)) { console.error("Render Game End called with invalid game data or status."); return; }
+             hideElement(activeGameLoader); // Ensure loader is hidden
+             stopGameTimer(); // Ensure timer is stopped
+             stopConfetti(); // Stop previous confetti
+             showElement(gameEndScreen);
+
+             const scoreA = game.score_a || 0;
+             const scoreB = game.score_b || 0;
+             let title = "Game Over!";
+             let background = 'linear-gradient(180deg, var(--surface-color) 0%, var(--background-color) 100%)'; // Default/Draw/Cancelled
+
+             if (game.status === 'finished') {
+                 const winner = game.winner;
+                 if (winner === 'A') { title = 'Team A Wins!'; background = 'linear-gradient(180deg, var(--primary-color) 0%, #8A2BE2 100%)'; }
+                 else if (winner === 'B') { title = 'Team B Wins!'; background = 'linear-gradient(180deg, var(--accent-color) 0%, var(--secondary-color) 100%)'; }
+                 else { title = 'It\'s a Draw!'; }
+                 finalScore.textContent = `Final Score: ${scoreA} - ${scoreB}`;
+                 showElement(finalScore);
+
+                 // Show MVP only if finished and MVP exists
+                 if(game.mvp_user_id) {
+                     const allPlayers = [...(game.team_a || []), ...(game.team_b || [])]; // Use teams if available, else look in profiles?
+                     // Fetch MVP profile for username if needed (might be slow) - simpler: find in team arrays if populated
+                     const mvpPlayer = allPlayers.find(p => p.user_id === game.mvp_user_id);
+                     if (mvpPlayer) {
+                         mvpUsername.textContent = mvpPlayer.username || 'Unknown MVP';
+                         // MVP score/stats might need separate tracking or calculation; keep simple for now
+                         mvpScore.textContent = `(Awarded MVP)`;
+                         showElement(mvpHighlight);
+                     } else {
+                        // MVP ID exists but player not found in teams (shouldn't happen often)
+                        mvpUsername.textContent = 'MVP Awarded';
+                        mvpScore.textContent = `(ID: ${game.mvp_user_id.substring(0,6)}...)`;
+                        showElement(mvpHighlight);
+                     }
+                 } else {
+                     hideElement(mvpHighlight);
+                 }
+                 showElement(shareResultsBtn); // Only show share for finished games
+                 startConfetti(); // Start confetti only for finished games
+             } else if (game.status === 'cancelled') {
+                 title = "Game Cancelled";
+                 finalScore.textContent = "This game was cancelled.";
+                 showElement(finalScore);
+                 hideElement(mvpHighlight);
+                 hideElement(shareResultsBtn);
+             }
+
+             gameEndTitle.textContent = title;
+             gameEndScreen.style.background = background;
+
+
+             backToMainBtn.onclick = () => { stopConfetti(); navigateTo('main'); fetchGames(); };
+             viewLeaderboardBtn.onclick = () => { stopConfetti(); navigateTo('leaderboard'); fetchLeaderboard('global'); };
+             shareResultsBtn.onclick = () => {
+                if (game.status === 'finished') {
+                    const shareText = `HoopsLink Game Finished! ${game.location_name || 'Game'}: A(${scoreA})-B(${scoreB}). ${game.winner ? (game.winner === 'draw' ? 'Draw!' : `Team ${game.winner} wins!`) : ''}`;
+                    showShareModal(shareText, window.location.href); // Maybe share a specific game result URL later
+                }
+             };
          };
         const renderProfile = (profileData) => {
-             hideElement(profileLoader); if (!profileData) { profileContent.innerHTML = `<p class="error-text p-2 tc">Profile load failed.</p>`; showElement(profileContent); return; } showElement(profileContent); if (profileContent.firstElementChild?.classList.contains('error-text')) { /* Clear error if needed, structure assumed OK */ }
-             userProfile = profileData;
-             profileUsername.textContent = profileData.username || 'No Username Set'; profileEmail.textContent = currentUser?.email || 'No email'; profileAvatar.textContent = getUserAvatarText(profileData.username);
+             hideElement(profileLoader); if (!profileData) { profileContent.innerHTML = `<p class="error-text p-2 tc">Profile could not be loaded.</p>`; showElement(profileContent); return; } showElement(profileContent); if (profileContent.firstElementChild?.classList.contains('error-text')) { /* Clear error if needed, structure assumed OK */ }
+             userProfile = profileData; // Update global state
+             profileUsername.textContent = profileData.username || 'No Username Set'; profileEmail.textContent = currentUser?.email || 'No email found'; profileAvatar.textContent = getUserAvatarText(profileData.username);
+             // Populate edit fields with current data
              editProfileUsernameInput.value = profileData.username || ''; editProfileCityInput.value = profileData.city || ''; editProfileStateInput.value = profileData.state || ''; editProfileCountryInput.value = profileData.country || '';
+             // Populate stats
              profileStatPoints.textContent = profileData.total_points_scored || 0; profileStatGames.textContent = profileData.games_played || 0; profileStatMvp.textContent = profileData.mvp_awards || 0;
-             toggleProfileEdit(false); // Start in display mode
-             loadGameHistory(profileData.user_id);
+             toggleProfileEdit(false); // Ensure profile starts in display mode
+             loadGameHistory(profileData.user_id); // Load game history after rendering profile
          };
         const renderGameHistory = (games) => {
              hideElement(gameHistoryLoader); gameHistoryList.innerHTML = ''; if (!games || games.length === 0) { showElement(noHistoryMessage); return; } hideElement(noHistoryMessage);
+             // Sort by creation time (most recent first)
              games.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
              games.forEach(game => {
-                 const li = document.createElement('li'); li.classList.add('history-item'); const isPlayerA = game.team_a?.some(p => p.user_id === currentUser?.id); const isPlayerB = game.team_b?.some(p => p.user_id === currentUser?.id); let result = 'N/A'; let resultClass = '';
-                 if (game.winner === 'A' && isPlayerA) { result = 'Win'; resultClass = 'result-win'; } else if (game.winner === 'B' && isPlayerB) { result = 'Win'; resultClass = 'result-win'; } else if (game.winner === 'A' && isPlayerB) { result = 'Loss'; resultClass = 'result-loss'; } else if (game.winner === 'B' && isPlayerA) { result = 'Loss'; resultClass = 'result-loss'; } else if (!game.winner || game.winner === 'draw') { result = 'Draw'; }
+                 const li = document.createElement('li'); li.classList.add('history-item');
+                 const isPlayerA = game.team_a?.some(p => p.user_id === currentUser?.id);
+                 const isPlayerB = game.team_b?.some(p => p.user_id === currentUser?.id);
+                 let result = 'N/A'; let resultClass = '';
+                 if (game.winner === 'A' && isPlayerA) { result = 'Win'; resultClass = 'result-win'; }
+                 else if (game.winner === 'B' && isPlayerB) { result = 'Win'; resultClass = 'result-win'; }
+                 else if (game.winner === 'A' && isPlayerB) { result = 'Loss'; resultClass = 'result-loss'; }
+                 else if (game.winner === 'B' && isPlayerA) { result = 'Loss'; resultClass = 'result-loss'; }
+                 else if (game.winner === 'draw' && (isPlayerA || isPlayerB)) { result = 'Draw'; }
+                 else if (!isPlayerA && !isPlayerB) { result = 'N/A (Spectator?)'; } // Should ideally not happen if query is correct
+
                  const isMvp = game.mvp_user_id === currentUser?.id;
                  li.innerHTML = `<div class="history-details">${game.location_name || 'Game'} - ${formatDate(game.created_at)}</div><div class="history-score">Score: ${game.score_a || 0} - ${game.score_b || 0}</div><div class="history-result ${resultClass}">Result: ${result} ${isMvp ? '(🏆 MVP)' : ''}</div>`;
                  gameHistoryList.appendChild(li);
@@ -1240,126 +1419,1754 @@
              hideElement(leaderboardLoader); leaderboardList.innerHTML = ''; if (!players || players.length === 0) { showElement(noLeaderboardMessage); return; } hideElement(noLeaderboardMessage);
              players.forEach((player, index) => {
                  const li = document.createElement('li'); li.classList.add('leaderboard-item'); li.style.setProperty('--animation-order', index);
-                 li.innerHTML = `<span class="leaderboard-rank">${index + 1}</span><div class="leaderboard-avatar">${getUserAvatarText(player.username)}</div><div class="leaderboard-info"><div class="leaderboard-username">${player.username || 'Anon'}</div><div class="leaderboard-stat">🏆 ${player.mvp_awards || 0} MVPs | ${player.games_played || 0} Games</div></div><div class="leaderboard-score">${player.total_points_scored || 0} PTS</div>`;
+                 // Basic stats display
+                 li.innerHTML = `<span class="leaderboard-rank">${index + 1}</span><div class="leaderboard-avatar">${getUserAvatarText(player.username)}</div><div class="leaderboard-info"><div class="leaderboard-username">${player.username || 'Anonymous User'}</div><div class="leaderboard-stat">🏆 ${player.mvp_awards || 0} MVPs | ${player.games_played || 0} Games</div></div><div class="leaderboard-score">${player.total_points_scored || 0} PTS</div>`;
                  leaderboardList.appendChild(li);
              });
              requestAnimationFrame(() => { document.querySelectorAll('.leaderboard-item').forEach(item => { item.style.opacity = '1'; item.style.transform = 'translateY(0)'; }); });
          };
         const renderChatMessages = (messages) => {
-             if (!messages || !Array.isArray(messages)) { messages = []; } const shouldScroll = chatMessages.scrollTop + chatMessages.clientHeight >= chatMessages.scrollHeight - 50; chatMessages.innerHTML = '';
+             if (!chatMessages) return; // Guard against element not existing yet
+             if (!messages || !Array.isArray(messages)) { messages = []; }
+             // Check if user is near the bottom before adding messages
+             const shouldScroll = chatMessages.scrollTop + chatMessages.clientHeight >= chatMessages.scrollHeight - 50;
+             chatMessages.innerHTML = ''; // Clear existing messages
              messages.forEach(msg => {
-                 const div = document.createElement('div'); div.classList.add('chat-message'); const isOwn = msg.user_id === currentUser?.id; if (isOwn) div.classList.add('own');
-                 div.innerHTML = `<div class="message-bubble">${msg.message || ''}</div><div class="message-meta">${!isOwn ? `<span class="message-sender">${msg.username || 'User'}</span>` : ''}<span>${formatDate(msg.timestamp || new Date())}</span></div>`;
+                 const div = document.createElement('div'); div.classList.add('chat-message');
+                 const isOwn = msg.user_id === currentUser?.id;
+                 if (isOwn) div.classList.add('own');
+                 // Sanitize message content slightly (basic example)
+                 const safeMessage = msg.message ? msg.message.replace(/</g, "&lt;").replace(/>/g, "&gt;") : '';
+                 div.innerHTML = `<div class="message-bubble">${safeMessage}</div><div class="message-meta">${!isOwn ? `<span class="message-sender">${msg.username || 'User'}</span>` : ''}<span>${formatDate(msg.timestamp || new Date())}</span></div>`;
                  chatMessages.appendChild(div);
              });
-             if (shouldScroll || chatDrawer.classList.contains('open')) scrollToChatBottom();
+             // Scroll to bottom if user was near the bottom or chat just opened
+             if (shouldScroll || chatDrawer.classList.contains('open')) {
+                 scrollToChatBottom();
+             }
          };
 
+
         // --- DATA FETCHING AND UPDATING ---
-        const fetchGames = async () => { if (!supabase) return; showElement(gameListLoader); hideElement(noGamesMessage); gameList.innerHTML = ''; try { const { data, error } = await supabase.from('games').select('*').in('status', ['pending', 'active']).order('start_time', { ascending: true, nullsLast: true }); if (error) throw error; renderGameList(data); subscribeToGamesList(); } catch (error) { console.error('Fetch games error:', error); hideElement(gameListLoader); showElement(noGamesMessage); noGamesMessage.textContent = "Games load failed."; } };
-        const fetchGameDetails = async (gameId) => { if (!supabase || !gameId) return; showElement(gameDetailLoader); hideElement(gameDetailContent); hideElement(gameDetailError); try { const { data, error } = await supabase.from('games').select('*').eq('id', gameId).single(); if (error) { if (error.code === 'PGRST116') throw new Error("Game not found."); else throw error; } renderGameDetail(data); subscribeToGame(gameId); renderChatMessages(data.chat_log || []); } catch (error) { console.error('Fetch details error:', error); hideElement(gameDetailLoader); showElement(gameDetailError); gameDetailError.textContent = `Details load failed: ${error.message}.`; hideElement(gameDetailContent); } };
-        const createGame = async (location, dateTime) => { if (!supabase || !currentUser) return { error: { message: 'Not logged in.'}}; try { if (!location.trim() || !dateTime) return { error: { message: 'Location/Time required.' } }; if (!userProfile?.username) { userProfile = await getUserProfile(currentUser.id); if (!userProfile?.username) return { error: { message: 'Set username first.' } }; } const initialPlayer = { user_id: currentUser.id, username: userProfile.username }; const { data, error } = await supabase.from('games').insert({ creator_id: currentUser.id, location_name: location, start_time: dateTime, status: 'pending', players: [initialPlayer], chat_log: [{ user_id: 'system', username: 'System', message: `${userProfile.username} created!`, timestamp: new Date().toISOString() }] }).select().single(); return { data, error }; } catch (error) { console.error('Create game error:', error); return { error }; } };
-        const joinGame = async (gameId) => { if (!supabase || !currentUser || !currentGameData) return; disableElement(joinLeaveGameBtn); gameDetailError.textContent = ''; try { const currentProfile = await getUserProfile(currentUser.id); if (!currentProfile?.username) throw new Error('Set username first.'); const players = currentGameData.players || []; if (players.length >= 10) throw new Error('Full!'); if (players.some(p => p.user_id === currentUser.id)) { enableElement(joinLeaveGameBtn); return; } const newPlayer = { user_id: currentUser.id, username: currentProfile.username }; const updatedPlayers = [...players, newPlayer]; const joinMessage = { user_id: 'system', username: 'System', message: `${currentProfile.username} joined!`, timestamp: new Date().toISOString() }; const updatedChatLog = [...(currentGameData.chat_log || []), joinMessage]; const { error } = await supabase.from('games').update({ players: updatedPlayers, chat_log: updatedChatLog }).eq('id', gameId); if (error) throw error; } catch (error) { console.error('Join error:', error); gameDetailError.textContent = `Join failed: ${error.message}`; showElement(gameDetailError); enableElement(joinLeaveGameBtn); } };
-        const leaveGame = async (gameId) => { if (!supabase || !currentUser || !currentGameData) return; disableElement(joinLeaveGameBtn); gameDetailError.textContent = ''; try { let players = currentGameData.players || []; if (!players.some(p => p.user_id === currentUser.id)) { enableElement(joinLeaveGameBtn); return; } if (currentGameData.creator_id === currentUser.id) throw new Error('Creator cannot leave.'); const updatedPlayers = players.filter(p => p.user_id !== currentUser.id); const currentProfile = await getUserProfile(currentUser.id); const username = currentProfile?.username || 'Player'; const leaveMessage = { user_id: 'system', username: 'System', message: `${username} left.`, timestamp: new Date().toISOString() }; const updatedChatLog = [...(currentGameData.chat_log || []), leaveMessage]; const { error } = await supabase.from('games').update({ players: updatedPlayers, chat_log: updatedChatLog }).eq('id', gameId); if (error) throw error; } catch (error) { console.error('Leave error:', error); gameDetailError.textContent = `Leave failed: ${error.message}`; showElement(gameDetailError); } };
-        const cancelGame = async (gameId) => { if (!supabase || !currentUser || !currentGameData) return; gameDetailError.textContent = ''; if (currentGameData.creator_id !== currentUser.id) { gameDetailError.textContent = "Creator only."; showElement(gameDetailError); return; } disableElement(cancelGameBtn); disableElement(beginGameBtn); if (!confirm("Cancel game?")) { enableElement(cancelGameBtn); if (currentGameData?.players?.length >= 4) enableElement(beginGameBtn); return; } try { const { error } = await supabase.from('games').update({ status: 'cancelled' }).eq('id', gameId); if (error) throw error; } catch (error) { console.error('Cancel error:', error); gameDetailError.textContent = `Cancel failed: ${error.message}`; showElement(gameDetailError); enableElement(cancelGameBtn); if (currentGameData?.players?.length >= 4) enableElement(beginGameBtn); } };
-        const beginGame = async (gameId) => { if (!supabase || !currentUser || !currentGameData) return; gameDetailError.textContent = ''; if (currentGameData.creator_id !== currentUser.id) { gameDetailError.textContent = "Creator only."; showElement(gameDetailError); return; } const MIN_PLAYERS_TO_START = 4; if ((currentGameData.players?.length || 0) < MIN_PLAYERS_TO_START) { gameDetailError.textContent = `Need ${MIN_PLAYERS_TO_START}+ players.`; showElement(gameDetailError); return; } disableElement(beginGameBtn); disableElement(cancelGameBtn); disableElement(joinLeaveGameBtn); try { let players = [...(currentGameData.players || [])]; for (let i=players.length-1; i>0; i--) { const j=Math.floor(Math.random()*(i+1)); [players[i], players[j]]=[players[j], players[i]]; } const mid = Math.ceil(players.length/2); const teamA=players.slice(0,mid); const teamB=players.slice(mid); const startMsg = { user_id: 'system', username: 'System', message: `Game started! GLHF!`, timestamp: new Date().toISOString() }; const chatLog = [...(currentGameData.chat_log || []), startMsg]; const { error } = await supabase.from('games').update({ status: 'active', team_a: teamA, team_b: teamB, score_a: 0, score_b: 0, point_proposals: null, players: null, chat_log: chatLog }).eq('id', gameId); if (error) throw error; } catch (error) { console.error('Begin game error:', error); gameDetailError.textContent = `Start failed: ${error.message}`; showElement(gameDetailError); enableElement(beginGameBtn); enableElement(cancelGameBtn); updateGameDetailButtons(currentGameData); } };
+        const fetchGames = async () => {
+            if (!supabase) return;
+            showElement(gameListLoader); hideElement(noGamesMessage); gameList.innerHTML = '';
+            try {
+                // Fetch pending and active games
+                const { data, error } = await supabase.from('games')
+                    .select('*')
+                    .in('status', ['pending', 'active'])
+                    .order('start_time', { ascending: true, nullsLast: true }); // Order by time
 
-        // --- Collaborative Scoring Logic --- (Simplified for brevity)
-        const proposeScore = async(t) => { if(!supabase||!currentUser||!currentGameData||currentGameData.status!=='active'||confirmingScore)return; const k=t==='A'?'teamA':'teamB'; const p=currentGameData.point_proposals||{}; if(confirmingScore||(Object.keys(p).length>0&&!p[k])) { setScoreErrorMessage("Wait."); return; } if(p[k]?.proposedBy===currentUser.id||p[k]?.confirmedBy?.includes(currentUser.id)) { setScoreErrorMessage("Waiting."); return; } console.log(`Propose +1 Team ${t}`); setScoreProposalMessage(`Proposing +1 Team ${t}...`); hideElement(scoreErrorMessage); const d={[k]:{proposedBy:currentUser.id,confirmedBy:[currentUser.id]}}; try { const{error}=await supabase.from('games').update({point_proposals:d}).eq('id',currentGameId); if(error) throw error; } catch(e){console.error("Propose error:",e); setScoreErrorMessage("Propose fail."); hideElement(scoreProposalMessage);}};
-        const confirmScoreProposal = async() => { if(!supabase||!currentUser||!currentGameData||!currentScoreProposal||confirmingScore)return; if(currentScoreProposal.proposedBy===currentUser.id&&currentGameData.point_proposals[currentScoreProposal.team==='A'?'teamA':'teamB']?.confirmedBy?.length<=1)return; confirmingScore=true; disableElement(confirmScoreBtn); disableElement(rejectScoreBtn); const k=currentScoreProposal.team==='A'?'teamA':'teamB'; let p=currentGameData.point_proposals||{}; if(!p[k]||p[k].confirmedBy?.includes(currentUser.id)){resetScoreConfirmationUI();confirmingScore=false;return;} const c=[...(p[k].confirmedBy||[]),currentUser.id]; const u={...p[k],confirmedBy:c}; const d={...p,[k]:u}; try { const{error}=await supabase.from('games').update({point_proposals:d}).eq('id',currentGameId); if(error)throw error; resetScoreConfirmationUI();} catch(e){console.error("Confirm error:",e); setScoreErrorMessage("Confirm fail."); resetScoreConfirmationUI();} finally { setTimeout(()=>{confirmingScore=false;},100);}};
-        const rejectScoreProposal = async() => { if(!supabase||!currentUser||!currentGameData||!currentScoreProposal)return; console.log("Rejecting:",currentScoreProposal.team); const k=currentScoreProposal.team==='A'?'teamA':'teamB'; let p=currentGameData.point_proposals||{}; if(p[k]){delete p[k]; try { const{error}=await supabase.from('games').update({point_proposals:Object.keys(p).length>0?p:null}).eq('id',currentGameId); if(error)throw error;} catch(e){console.error("Reject DB error:",e); setScoreErrorMessage("Reject fail.");}} resetScoreConfirmationUI(); setScoreProposalMessage("Rejected."); setTimeout(()=>hideElement(scoreProposalMessage),3000);};
-        const checkAndApplyScore = async(g) => { if(!g||g.status!=='active')return; const p=g.point_proposals; resetScoreConfirmationUI(); if(!p||Object.keys(p).length===0)return; const tp=(g.team_a?.length||0)+(g.team_b?.length||0); if(tp<1)return; const req=Math.max(1,Math.floor(tp/2)+1); let u=false; let pl={}; let apk=null; for(const k in p){const prop=p[k]; if(prop?.confirmedBy?.length>=req){const t=k==='teamA'?'A':'B'; console.log(`Confirmed ${prop.confirmedBy.length}/${req} Team ${t}! Apply.`); pl={point_proposals:null}; pl[t==='A'?'score_a':'score_b']=(g[t==='A'?'score_a':'score_b']||0)+1; u=true; apk=k; break;}} if(u){hideElement(scoreProposalMessage); hideElement(scoreErrorMessage); try {const{data:ug,error}=await supabase.from('games').update(pl).eq('id',g.id).select().single(); if(error)throw error; console.log("Score applied."); currentGameData=ug; const sl=11; if((ug.score_a>=sl||ug.score_b>=sl)&&ug.score_a!==ug.score_b)endGame(ug);} catch(e){console.error("Apply score error:",e); setScoreErrorMessage("Apply score fail.");}} else {updateScoreProposalUI(p);}};
-        const updateScoreProposalUI = (p) => { resetScoreConfirmationUI(); hideElement(scoreProposalMessage); hideElement(scoreErrorMessage); p=p||{}; let ap=null; let apk=null; for(const k in p){if(p[k]){ap=p[k];apk=k;break;}} if(ap){const t=apk==='teamA'?'A':'B'; const pid=ap.proposedBy; const c=ap.confirmedBy||[]; const tp=(currentGameData?.team_a?.length||0)+(currentGameData?.team_b?.length||0); const req=Math.max(1,Math.floor(tp/2)+1); if(currentUser&&!c.includes(currentUser.id)){currentScoreProposal={proposedBy:pid,team:t}; scoreConfirmText.textContent=`Confirm +1 Team ${t}? (${c.length}/${req})`; showScoreConfirmationModal();} else {setScoreProposalMessage(`Waiting... (${c.length}/${req} confirmed)`);}}};
-        const showScoreConfirmationModal = () => { scoreConfirmationModal.classList.add('visible'); enableElement(confirmScoreBtn); enableElement(rejectScoreBtn); }; const resetScoreConfirmationUI = () => { scoreConfirmationModal.classList.remove('visible'); currentScoreProposal = null; }; const setScoreProposalMessage = (m) => { scoreProposalMessage.textContent=m; showElement(scoreProposalMessage); hideElement(scoreErrorMessage); }; const setScoreErrorMessage = (m) => { scoreErrorMessage.textContent=m; showElement(scoreErrorMessage); hideElement(scoreProposalMessage); setTimeout(()=>hideElement(scoreErrorMessage),5000);};
+                if (error) throw error;
+                renderGameList(data);
+                subscribeToGamesList(); // Subscribe after initial fetch
+            } catch (error) {
+                console.error('Fetch games error:', error);
+                hideElement(gameListLoader);
+                showElement(noGamesMessage);
+                noGamesMessage.textContent = "Failed to load games.";
+            }
+        };
+        const fetchGameDetails = async (gameId) => {
+            if (!supabase || !gameId) return;
+            showElement(gameDetailLoader); hideElement(gameDetailContent); hideElement(gameDetailError);
+            try {
+                const { data, error, status } = await supabase.from('games')
+                    .select('*') // Select all columns for detail view
+                    .eq('id', gameId)
+                    .single();
 
-        const endGame = async (gameData) => { if (!supabase || !currentUser || gameData.status !== 'active') { console.warn("endGame called inappropriately", gameData?.status); return; } console.log("Ending game:", gameData.id); const scoreA = Number(gameData.score_a || 0); const scoreB = Number(gameData.score_b || 0); const winner = scoreA > scoreB ? 'A' : (scoreB > scoreA ? 'B' : 'draw'); let mvpUserId = null; const winningTeam = winner === 'A' ? gameData.team_a : (winner === 'B' ? gameData.team_b : null); if (winningTeam?.length > 0) { mvpUserId = winningTeam[0].user_id; } const updatePayload = { status: 'finished', winner: winner, mvp_user_id: mvpUserId, point_proposals: null }; try { const { error: gameUpdateError } = await supabase.from('games').update(updatePayload).eq('id', gameData.id); if (gameUpdateError) throw gameUpdateError; const players = [...(gameData.team_a || []), ...(gameData.team_b || [])]; const statPromises = players.map(async (player) => { try { const profile = await getUserProfile(player.user_id); if (!profile) { console.warn(`Profile missing ${player.user_id}`); return; } const updates = { games_played: (profile.games_played || 0) + 1, total_points_scored: (profile.total_points_scored || 0) + 5 + (player.user_id === mvpUserId ? 10 : 0), mvp_awards: (profile.mvp_awards || 0) + (player.user_id === mvpUserId ? 1 : 0) }; const { error: updateError } = await updateUserProfile(player.user_id, updates); if (updateError) { console.error(`Stats fail ${player.user_id}:`, updateError); } } catch(statErr) { console.error(`Stats exception ${player.user_id}:`, statErr); } }); await Promise.all(statPromises); console.log("Game ended & stats updated."); } catch (error) { console.error("End game error:", error); if (currentScreen === 'active') { setScoreErrorMessage("Finalizing error."); } } };
-        const sendChatMessage = async (msg) => { if (!supabase || !currentUser || !currentGameData || !msg.trim()) return; if (!userProfile?.username) { userProfile = await getUserProfile(currentUser.id); if (!userProfile?.username) { alert("Set username first."); return; } } const newMsg = { user_id: currentUser.id, username: userProfile.username, message: msg.trim(), timestamp: new Date().toISOString() }; const currentLog = currentGameData.chat_log || []; const updatedLog = [...currentLog, newMsg]; renderChatMessages(updatedLog); scrollToChatBottom(); chatInput.value = ''; try { const { error } = await supabase.from('games').update({ chat_log: updatedLog }).eq('id', currentGameId); if (error) throw error; currentGameData.chat_log = updatedLog; } catch (e) { console.error("Chat send error:", e); renderChatMessages(currentLog); alert("Msg fail."); chatInput.value = msg; } };
-        const fetchProfileData = async (userId) => { if (!supabase) return; showElement(profileLoader); hideElement(profileContent); try { const profile = await getUserProfile(userId); renderProfile(profile); } catch (e) { console.error("Profile load error:", e); hideElement(profileLoader); profileContent.innerHTML = `<p class="error-text p-2 tc">Load failed.</p>`; showElement(profileContent); } };
-        const loadGameHistory = async (userId) => { if (!supabase) return; showElement(gameHistoryLoader); hideElement(noHistoryMessage); gameHistoryList.innerHTML = ''; try { const { data, error } = await supabase.from('games').select('*').eq('status', 'finished').order('created_at', { ascending: false }).limit(50); if (error) throw error; const userHistory = data.filter(g => g.team_a?.some(p => p.user_id === userId) || g.team_b?.some(p => p.user_id === userId)); renderGameHistory(userHistory); } catch (e) { console.error("History error:", e); hideElement(gameHistoryLoader); showElement(noHistoryMessage); noHistoryMessage.textContent = "History load fail."; } };
+                if (error) {
+                    if (status === 406) { // Not found
+                         throw new Error("Game not found or has been removed.");
+                    } else { // Other DB error
+                        throw error;
+                    }
+                }
+
+                // If game is active or finished/cancelled, redirect from detail view
+                if (data.status === 'active') {
+                    console.log(`Game ${gameId} is active, navigating to active screen.`);
+                    navigateTo('active');
+                    renderActiveGame(data); // Render immediately
+                    subscribeToGame(gameId); // Subscribe for updates
+                } else if (data.status === 'finished' || data.status === 'cancelled') {
+                     console.log(`Game ${gameId} is ${data.status}, navigating to end screen.`);
+                     navigateTo('end');
+                     renderGameEnd(data); // Render end screen
+                     // No need to subscribe to finished/cancelled games
+                } else if (data.status === 'pending') {
+                    // Stay on detail screen for pending games
+                    renderGameDetail(data);
+                    subscribeToGame(gameId); // Subscribe for updates (joins, cancellations, start)
+                    renderChatMessages(data.chat_log || []); // Show chat log
+                } else {
+                    // Unknown status? Treat as error or navigate away
+                    console.warn(`Game ${gameId} has unexpected status: ${data.status}`);
+                    navigateTo('main');
+                    fetchGames();
+                }
+
+            } catch (error) {
+                console.error('Fetch game details error:', error);
+                hideElement(gameDetailLoader);
+                showElement(gameDetailError);
+                gameDetailError.textContent = `Error loading game: ${error.message}.`;
+                hideElement(gameDetailContent);
+                // Maybe add a button to go back to the list
+            }
+        };
+        const createGame = async (location, dateTime) => {
+            if (!supabase || !currentUser) return { error: { message: 'You must be logged in to create a game.'}};
+            try {
+                if (!location.trim()) return { error: { message: 'Please provide a location name.' } };
+                if (!dateTime) return { error: { message: 'Please select a date and time.' } };
+                // Ensure user has a profile/username before creating
+                if (!userProfile?.username) {
+                    userProfile = await getUserProfile(currentUser.id); // Attempt to fetch if missing
+                    if (!userProfile?.username) {
+                        return { error: { message: 'Please set a username in your profile before creating a game.' } };
+                    }
+                }
+                // Creator automatically joins the game
+                const initialPlayer = { user_id: currentUser.id, username: userProfile.username };
+                const initialChatMessage = {
+                    user_id: 'system', // Use 'system' or null for system messages
+                    username: 'System',
+                    message: `${userProfile.username} created the game! Waiting for players...`,
+                    timestamp: new Date().toISOString()
+                };
+                const { data, error } = await supabase.from('games')
+                    .insert({
+                        creator_id: currentUser.id,
+                        location_name: location.trim(),
+                        start_time: dateTime,
+                        status: 'pending', // Initial status
+                        players: [initialPlayer], // Add creator to players list
+                        chat_log: [initialChatMessage], // Start chat log
+                        // Ensure other fields like teams, scores, etc., are null or default initially
+                        team_a: null,
+                        team_b: null,
+                        score_a: 0,
+                        score_b: 0,
+                        point_proposals: null,
+                        winner: null,
+                        mvp_user_id: null,
+                        game_end_time: null // Null initially, set when game starts
+                    })
+                    .select() // Select the newly created game data
+                    .single(); // Expecting a single row back
+
+                if (error) throw error;
+                return { data, error: null }; // Success
+            } catch (error) {
+                console.error('Create game error:', error);
+                return { error }; // Return the error object
+            }
+        };
+        const joinGame = async (gameId) => {
+            if (!supabase || !currentUser || !currentGameData || currentGameData.status !== 'pending') {
+                gameDetailError.textContent = 'Cannot join this game now.'; showElement(gameDetailError); return;
+            }
+            disableElement(joinLeaveGameBtn); gameDetailError.textContent = '';
+            try {
+                const currentProfile = userProfile || await getUserProfile(currentUser.id); // Use cached or fetch
+                if (!currentProfile?.username) throw new Error('Please set a username in your profile first.');
+
+                let { players, chat_log } = currentGameData; // Get current players and chat
+                players = players || [];
+                chat_log = chat_log || [];
+
+                if (players.length >= 10) throw new Error('This game is already full.');
+                if (players.some(p => p.user_id === currentUser.id)) { // Already in game
+                    enableElement(joinLeaveGameBtn); updateGameDetailButtons(currentGameData); return; // Just re-enable button
+                }
+
+                const newPlayer = { user_id: currentUser.id, username: currentProfile.username };
+                const updatedPlayers = [...players, newPlayer];
+                const joinMessage = { user_id: 'system', username: 'System', message: `${currentProfile.username} joined the game!`, timestamp: new Date().toISOString() };
+                const updatedChatLog = [...chat_log, joinMessage];
+
+                // Update the game in DB
+                const { error } = await supabase.from('games')
+                    .update({ players: updatedPlayers, chat_log: updatedChatLog })
+                    .eq('id', gameId)
+                    .eq('status', 'pending'); // Ensure game is still pending
+
+                if (error) throw error;
+                // No need to manually update UI, realtime subscription will handle it.
+                // Enable button might happen via realtime update render, or do it here defensively?
+                // Let's rely on realtime for consistency. If it fails, user sees old state briefly.
+
+            } catch (error) {
+                console.error('Join game error:', error);
+                gameDetailError.textContent = `Failed to join: ${error.message}`;
+                showElement(gameDetailError);
+                // Re-enable button based on potentially stale data if DB update failed
+                 enableElement(joinLeaveGameBtn);
+                 updateGameDetailButtons(currentGameData); // Re-render buttons based on potentially old data
+            }
+        };
+        const leaveGame = async (gameId) => {
+            if (!supabase || !currentUser || !currentGameData || currentGameData.status !== 'pending') {
+                 gameDetailError.textContent = 'Cannot leave this game now.'; showElement(gameDetailError); return;
+            }
+            // Prevent creator from leaving via this button (must cancel)
+            if (currentGameData.creator_id === currentUser.id) {
+                 gameDetailError.textContent = 'Creator cannot leave, please cancel the game instead.'; showElement(gameDetailError); return;
+            }
+
+            disableElement(joinLeaveGameBtn); gameDetailError.textContent = '';
+            try {
+                let { players, chat_log } = currentGameData;
+                players = players || [];
+                chat_log = chat_log || [];
+
+                if (!players.some(p => p.user_id === currentUser.id)) { // Not actually in game
+                     enableElement(joinLeaveGameBtn); updateGameDetailButtons(currentGameData); return; // Just re-enable button
+                }
+
+                const updatedPlayers = players.filter(p => p.user_id !== currentUser.id);
+                const currentProfile = userProfile || await getUserProfile(currentUser.id); // For username in message
+                const username = currentProfile?.username || 'A player';
+                const leaveMessage = { user_id: 'system', username: 'System', message: `${username} left the game.`, timestamp: new Date().toISOString() };
+                const updatedChatLog = [...chat_log, leaveMessage];
+
+                // Update the game in DB
+                const { error } = await supabase.from('games')
+                    .update({ players: updatedPlayers, chat_log: updatedChatLog })
+                    .eq('id', gameId)
+                    .eq('status', 'pending');
+
+                if (error) throw error;
+                // Realtime will update UI
+
+            } catch (error) {
+                console.error('Leave game error:', error);
+                gameDetailError.textContent = `Failed to leave: ${error.message}`;
+                showElement(gameDetailError);
+                // Re-enable button based on potentially stale data
+                enableElement(joinLeaveGameBtn);
+                updateGameDetailButtons(currentGameData);
+            }
+        };
+        const cancelGame = async (gameId) => {
+            if (!supabase || !currentUser || !currentGameData || currentGameData.status !== 'pending') {
+                gameDetailError.textContent = "Can only cancel pending games."; showElement(gameDetailError); return;
+            }
+            if (currentGameData.creator_id !== currentUser.id) {
+                gameDetailError.textContent = "Only the creator can cancel the game."; showElement(gameDetailError); return;
+            }
+
+            disableElement(cancelGameBtn); disableElement(beginGameBtn); disableElement(joinLeaveGameBtn); // Disable all actions
+            gameDetailError.textContent = '';
+
+            if (!confirm("Are you sure you want to cancel this game? This cannot be undone.")) {
+                // Re-enable buttons based on current state if user cancels confirmation
+                updateGameDetailButtons(currentGameData);
+                return;
+            }
+
+            try {
+                const cancelMessage = { user_id: 'system', username: 'System', message: `Game cancelled by the creator.`, timestamp: new Date().toISOString() };
+                const updatedChatLog = [...(currentGameData.chat_log || []), cancelMessage];
+
+                const { error } = await supabase.from('games')
+                    .update({ status: 'cancelled', players: null, chat_log: updatedChatLog }) // Clear players list on cancel
+                    .eq('id', gameId)
+                    .eq('status', 'pending'); // Ensure it's still pending
+
+                if (error) throw error;
+                // Realtime should navigate user away or show cancelled state.
+                // If realtime fails, user might be stuck. Navigate defensively?
+                // Let's assume realtime works. It will trigger fetchGameDetails -> navigateTo('end') -> renderGameEnd.
+
+            } catch (error) {
+                console.error('Cancel game error:', error);
+                gameDetailError.textContent = `Failed to cancel: ${error.message}`;
+                showElement(gameDetailError);
+                // Re-enable buttons based on potentially stale data
+                updateGameDetailButtons(currentGameData);
+            }
+        };
+        const beginGame = async (gameId) => {
+            if (!supabase || !currentUser || !currentGameData || currentGameData.status !== 'pending') {
+                 gameDetailError.textContent = "Game cannot be started now."; showElement(gameDetailError); return;
+            }
+            if (currentGameData.creator_id !== currentUser.id) {
+                 gameDetailError.textContent = "Only the creator can start the game."; showElement(gameDetailError); return;
+            }
+             const players = currentGameData.players || [];
+            if (players.length < MIN_PLAYERS_TO_START) {
+                 gameDetailError.textContent = `Cannot start yet, need at least ${MIN_PLAYERS_TO_START} players (currently ${players.length}).`; showElement(gameDetailError); return;
+            }
+
+            disableElement(beginGameBtn); disableElement(cancelGameBtn); disableElement(joinLeaveGameBtn);
+            gameDetailError.textContent = '';
+
+            try {
+                // 1. Shuffle Players (Fisher-Yates algorithm)
+                let shuffledPlayers = [...players];
+                for (let i = shuffledPlayers.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [shuffledPlayers[i], shuffledPlayers[j]] = [shuffledPlayers[j], shuffledPlayers[i]];
+                }
+
+                // 2. Assign Teams
+                const midPoint = Math.ceil(shuffledPlayers.length / 2);
+                const teamA = shuffledPlayers.slice(0, midPoint);
+                const teamB = shuffledPlayers.slice(midPoint);
+
+                // 3. Calculate Game End Time
+                const gameEndTime = new Date(Date.now() + GAME_DURATION_MINUTES * 60 * 1000);
+
+                // 4. Prepare Update Payload
+                const startMessage = { user_id: 'system', username: 'System', message: `Game started by the creator! Teams assigned. ${GAME_DURATION_MINUTES} min clock. GLHF!`, timestamp: new Date().toISOString() };
+                const updatedChatLog = [...(currentGameData.chat_log || []), startMessage];
+
+                const updatePayload = {
+                    status: 'active',
+                    team_a: teamA,
+                    team_b: teamB,
+                    score_a: 0, // Reset scores
+                    score_b: 0,
+                    point_proposals: null, // Clear any old proposals
+                    players: null, // Clear the 'pending players' list
+                    chat_log: updatedChatLog,
+                    game_end_time: gameEndTime.toISOString() // Set the calculated end time
+                };
+
+                // 5. Update Database
+                const { error } = await supabase.from('games')
+                    .update(updatePayload)
+                    .eq('id', gameId)
+                    .eq('status', 'pending'); // Ensure still pending
+
+                if (error) throw error;
+
+                // 6. Navigate & Render (will also be triggered by realtime, but doing it here provides faster feedback)
+                // navigateTo('active'); // Let realtime handle navigation for consistency
+                // renderActiveGame(await fetchGameDetails(gameId)); // Re-fetch might be needed if realtime is slow
+
+                // Realtime subscription should now pick up the 'active' status change and handle navigation/rendering.
+
+            } catch (error) {
+                console.error('Begin game error:', error);
+                gameDetailError.textContent = `Failed to start game: ${error.message}`;
+                showElement(gameDetailError);
+                // Re-enable buttons based on potentially stale data
+                updateGameDetailButtons(currentGameData);
+            }
+        };
+
+        // --- Collaborative Scoring Logic ---
+        const proposeScore = async(team) => { // team is 'A' or 'B'
+            if(!supabase || !currentUser || !currentGameData || currentGameData.status !== 'active' || confirmingScore) {
+                 setScoreErrorMessage("Cannot propose score now."); return;
+            }
+            const proposalKey = team === 'A' ? 'teamA' : 'teamB';
+            const currentProposals = currentGameData.point_proposals || {};
+
+            // Check if another proposal is active for the *other* team
+            const otherKey = team === 'A' ? 'teamB' : 'teamA';
+            if (currentProposals[otherKey]) {
+                 setScoreErrorMessage("Wait for the other team's proposal to resolve."); return;
+            }
+
+            // Check if this user already proposed or confirmed *this* proposal
+            const existingProposal = currentProposals[proposalKey];
+            if (existingProposal) {
+                if (existingProposal.proposedBy === currentUser.id) {
+                    setScoreErrorMessage("You already proposed this."); return;
+                }
+                if (existingProposal.confirmedBy?.includes(currentUser.id)) {
+                     setScoreErrorMessage("You already confirmed this."); return;
+                }
+            }
+
+            console.log(`User ${currentUser.id} proposing +1 for Team ${team}`);
+            setScoreProposalMessage(`Proposing +1 Team ${team}...`); hideElement(scoreErrorMessage);
+
+            // Create or update the proposal
+            const newProposalData = {
+                 proposedBy: existingProposal?.proposedBy || currentUser.id, // Keep original proposer if exists
+                 confirmedBy: [...(existingProposal?.confirmedBy || []), currentUser.id] // Add current user to confirmations
+             };
+            // Ensure proposal includes the proposer in confirmedBy list if it's the first confirmation
+             if (!existingProposal) {
+                 newProposalData.confirmedBy = [currentUser.id];
+                 newProposalData.proposedBy = currentUser.id; // Ensure proposer is set
+             }
+
+
+             const updatePayload = {
+                 point_proposals: {
+                     ...currentProposals, // Keep other existing proposals if any (shouldn't be)
+                     [proposalKey]: newProposalData
+                 }
+             };
+
+             try {
+                 const { error } = await supabase.from('games')
+                    .update(updatePayload)
+                    .eq('id', currentGameId)
+                    .eq('status', 'active'); // Ensure game is still active
+                 if (error) throw error;
+                 // Realtime update will trigger checkAndApplyScore and UI updates
+
+             } catch(e) {
+                 console.error("Propose score error:", e);
+                 setScoreErrorMessage("Failed to propose score."); hideElement(scoreProposalMessage);
+             }
+        };
+        const confirmScoreProposal = async() => {
+            if(!supabase || !currentUser || !currentGameData || !currentScoreProposal || confirmingScore || currentGameData.status !== 'active') {
+                resetScoreConfirmationUI(); return;
+            }
+
+            const proposalKey = currentScoreProposal.team === 'A' ? 'teamA' : 'teamB';
+            const currentProposals = currentGameData.point_proposals || {};
+            const proposalToConfirm = currentProposals[proposalKey];
+
+            // Basic sanity checks
+            if (!proposalToConfirm) { resetScoreConfirmationUI(); return; } // Proposal disappeared
+            if (proposalToConfirm.proposedBy === currentUser.id && proposalToConfirm.confirmedBy?.length < 1) {
+                setScoreErrorMessage("Cannot confirm your own initial proposal."); // Prevent proposer from being the only confirmation instantly
+                resetScoreConfirmationUI(); return;
+            }
+            if (proposalToConfirm.confirmedBy?.includes(currentUser.id)) { // Already confirmed
+                 resetScoreConfirmationUI(); return;
+            }
+
+            confirmingScore = true; // Prevent double clicks
+            disableElement(confirmScoreBtn); disableElement(rejectScoreBtn);
+
+            const updatedConfirmedBy = [...(proposalToConfirm.confirmedBy || []), currentUser.id];
+            const updatedProposal = { ...proposalToConfirm, confirmedBy: updatedConfirmedBy };
+            const updatePayload = { point_proposals: { ...currentProposals, [proposalKey]: updatedProposal } };
+
+            try {
+                 const { error } = await supabase.from('games')
+                    .update(updatePayload)
+                    .eq('id', currentGameId)
+                    .eq('status', 'active');
+                 if (error) throw error;
+                 // Realtime update will handle UI and checkAndApplyScore
+                 resetScoreConfirmationUI(); // Reset UI immediately for responsiveness
+
+            } catch(e) {
+                 console.error("Confirm score error:", e);
+                 setScoreErrorMessage("Failed to confirm score.");
+                 resetScoreConfirmationUI(); // Reset UI on error
+            } finally {
+                 // Add a small delay before allowing another action
+                 setTimeout(() => { confirmingScore = false; }, 300);
+            }
+        };
+        const rejectScoreProposal = async() => {
+            if(!supabase || !currentUser || !currentGameData || !currentScoreProposal || confirmingScore || currentGameData.status !== 'active') {
+                 resetScoreConfirmationUI(); return;
+            }
+
+            console.log(`User ${currentUser.id} rejecting proposal for Team ${currentScoreProposal.team}`);
+            confirmingScore = true; // Prevent actions during rejection
+            disableElement(confirmScoreBtn); disableElement(rejectScoreBtn);
+
+            const proposalKey = currentScoreProposal.team === 'A' ? 'teamA' : 'teamB';
+            let currentProposals = { ...(currentGameData.point_proposals || {}) }; // Clone proposals
+
+            if(currentProposals[proposalKey]) {
+                delete currentProposals[proposalKey]; // Remove the rejected proposal
+                const updatePayload = { point_proposals: Object.keys(currentProposals).length > 0 ? currentProposals : null }; // Set to null if empty
+
+                try {
+                    const { error } = await supabase.from('games')
+                        .update(updatePayload)
+                        .eq('id', currentGameId)
+                        .eq('status', 'active');
+                    if (error) throw error;
+                    // Realtime update will refresh UI
+                    setScoreProposalMessage("Proposal rejected."); // Give feedback
+                    setTimeout(()=>hideElement(scoreProposalMessage), 3000);
+
+                } catch(e) {
+                     console.error("Reject score DB error:", e);
+                     setScoreErrorMessage("Failed to reject proposal.");
+                }
+            }
+            // Reset UI regardless of DB success/failure
+             resetScoreConfirmationUI();
+             setTimeout(() => { confirmingScore = false; }, 300); // Re-enable actions after delay
+        };
+        // This function checks if any proposal has enough confirmations and applies the score
+        const checkAndApplyScore = async(gameData) => {
+            if(!gameData || gameData.status !== 'active' || !gameData.point_proposals) {
+                updateScoreProposalUI(gameData?.point_proposals); // Still update UI even if no proposals
+                return;
+            }
+
+            const proposals = gameData.point_proposals;
+            const totalPlayers = (gameData.team_a?.length || 0) + (gameData.team_b?.length || 0);
+            if (totalPlayers < 1) return; // Avoid division by zero or weird logic
+
+            // Determine required confirmations (e.g., majority)
+            // Simple majority: Math.floor(totalPlayers / 2) + 1
+            // Stricter: Math.ceil(totalPlayers / 2) + (totalPlayers % 2 === 0 ? 1 : 0) // Need > 50%
+            const requiredConfirmations = Math.max(1, Math.floor(totalPlayers / 2) + 1); // At least 1, simple majority
+
+            let scoreApplied = false;
+            let updatePayload = {};
+
+            for (const key in proposals) { // key is 'teamA' or 'teamB'
+                const proposal = proposals[key];
+                if (proposal?.confirmedBy?.length >= requiredConfirmations) {
+                    const teamToScore = key === 'teamA' ? 'A' : 'B';
+                    console.log(`Score confirmed for Team ${teamToScore}! (${proposal.confirmedBy.length}/${requiredConfirmations})`);
+
+                    // Prepare update: increment score and clear proposals
+                    updatePayload = {
+                        point_proposals: null, // Clear all proposals once one is confirmed
+                        score_a: gameData.score_a || 0,
+                        score_b: gameData.score_b || 0
+                    };
+                    if (teamToScore === 'A') {
+                        updatePayload.score_a++;
+                    } else {
+                         updatePayload.score_b++;
+                    }
+                    scoreApplied = true;
+                    break; // Only apply one score per check
+                }
+            }
+
+            if (scoreApplied) {
+                hideElement(scoreProposalMessage); hideElement(scoreErrorMessage); resetScoreConfirmationUI();
+                try {
+                    // Update the database with the new score and cleared proposals
+                    const { data: updatedGame, error } = await supabase.from('games')
+                        .update(updatePayload)
+                        .eq('id', gameData.id)
+                        .eq('status', 'active') // Ensure still active
+                        .select() // Get the updated game data back
+                        .single();
+
+                    if (error) throw error;
+                    console.log("Score applied successfully. New score:", updatedGame.score_a, "-", updatedGame.score_b);
+                    currentGameData = updatedGame; // Update local state immediately
+
+                    // Check if the game should end due to score limit AFTER applying score
+                    if ((updatedGame.score_a >= SCORE_LIMIT || updatedGame.score_b >= SCORE_LIMIT) && updatedGame.score_a !== updatedGame.score_b) {
+                        console.log("Score limit reached, ending game.");
+                        endGame(updatedGame); // End the game
+                    } else {
+                         renderActiveGame(updatedGame); // Re-render active game with new score (if not ended)
+                    }
+
+                } catch(e) {
+                     console.error("Apply score error:", e);
+                     setScoreErrorMessage("Failed to apply score update.");
+                     // Re-render with old data maybe? Or let next realtime update try again.
+                     renderActiveGame(gameData); // Re-render with data before failed apply
+                }
+            } else {
+                // No score applied, just update the proposal UI based on current proposals
+                updateScoreProposalUI(proposals);
+            }
+        };
+        const updateScoreProposalUI = (proposals) => {
+            resetScoreConfirmationUI(); // Hide confirmation modal by default
+            hideElement(scoreProposalMessage); // Hide general proposal message
+            hideElement(scoreErrorMessage); // Hide error message
+
+            proposals = proposals || {};
+            let activeProposal = null;
+            let activeProposalKey = null;
+
+            // Find the first active proposal (should only be one ideally)
+            for (const key in proposals) {
+                if (proposals[key]) {
+                    activeProposal = proposals[key];
+                    activeProposalKey = key;
+                    break;
+                }
+            }
+
+            if (activeProposal && currentUser) {
+                const team = activeProposalKey === 'teamA' ? 'A' : 'B';
+                const proposerId = activeProposal.proposedBy;
+                const confirmedByIds = activeProposal.confirmedBy || [];
+                const totalPlayers = (currentGameData?.team_a?.length || 0) + (currentGameData?.team_b?.length || 0);
+                const requiredConfirmations = Math.max(1, Math.floor(totalPlayers / 2) + 1);
+
+                // If current user has NOT confirmed yet, show the confirmation modal
+                if (!confirmedByIds.includes(currentUser.id)) {
+                    currentScoreProposal = { proposedBy: proposerId, team: team }; // Set state for confirm/reject handlers
+                    scoreConfirmText.textContent = `Confirm +1 Team ${team}? (${confirmedByIds.length}/${requiredConfirmations})`;
+                    showScoreConfirmationModal();
+                } else {
+                    // User has already confirmed, show waiting message
+                    setScoreProposalMessage(`Waiting for others... (${confirmedByIds.length}/${requiredConfirmations} confirmed for Team ${team})`);
+                }
+            }
+            // If no active proposal, all messages/modals remain hidden
+        };
+        const showScoreConfirmationModal = () => { scoreConfirmationModal.classList.add('visible'); enableElement(confirmScoreBtn); enableElement(rejectScoreBtn); };
+        const resetScoreConfirmationUI = () => { scoreConfirmationModal.classList.remove('visible'); currentScoreProposal = null; };
+        const setScoreProposalMessage = (msg) => { scoreProposalMessage.textContent = msg; showElement(scoreProposalMessage); hideElement(scoreErrorMessage); };
+        const setScoreErrorMessage = (msg) => { scoreErrorMessage.textContent = msg; showElement(scoreErrorMessage); hideElement(scoreProposalMessage); setTimeout(()=>hideElement(scoreErrorMessage), 5000); }; // Auto-hide error after 5s
+
+        const endGame = async (gameData) => {
+            // Prevent multiple endGame calls for the same game
+            if (!gameData || !['active', 'pending'].includes(gameData.status)) { // Allow ending pending games if time expires somehow? No, only active.
+                 console.warn("endGame called on non-active or missing game data. Status:", gameData?.status);
+                 return;
+            }
+             // Check if already finishing (maybe via race condition)
+            if (gameData.status !== 'active') {
+                console.log("Game already finished or cancelled. Skipping endGame.");
+                return;
+            }
+
+            console.log("Attempting to end game:", gameData.id);
+            stopGameTimer(); // Ensure timer is stopped
+
+            const scoreA = Number(gameData.score_a || 0);
+            const scoreB = Number(gameData.score_b || 0);
+            let winner = 'draw'; // Default to draw
+             if (scoreA > scoreB) winner = 'A';
+             else if (scoreB > scoreA) winner = 'B';
+
+             // Determine MVP - simplistic: random player from winning team, or creator if draw/no teams?
+             // Better MVP: Could be highest scorer if tracked, or most confirmations? Keep simple for now.
+             let mvpUserId = null;
+             const winningTeam = winner === 'A' ? gameData.team_a : (winner === 'B' ? gameData.team_b : null);
+             if (winningTeam && winningTeam.length > 0) {
+                 // Pick a random player from the winning team as MVP
+                 mvpUserId = winningTeam[Math.floor(Math.random() * winningTeam.length)].user_id;
+             } else if (winner === 'draw') {
+                // Assign MVP to creator on draw? Or no MVP? Let's say no MVP on draw.
+                // mvpUserId = gameData.creator_id;
+             }
+            // If somehow teams are empty but there's a winner by score? Assign to creator? Fallback.
+             if (!mvpUserId && winner !== 'draw') {
+                const teamWithScore = winner === 'A' ? gameData.team_a : gameData.team_b;
+                if (!teamWithScore || teamWithScore.length === 0) {
+                     mvpUserId = gameData.creator_id; // Fallback MVP if winning team empty
+                }
+             }
+
+
+            const updatePayload = {
+                 status: 'finished',
+                 winner: winner,
+                 mvp_user_id: mvpUserId,
+                 point_proposals: null, // Clear proposals
+                 game_end_time: gameData.game_end_time || new Date().toISOString() // Keep original end time if set, else now
+                 // Keep scores, teams, location etc.
+             };
+
+            try {
+                 // Update the game status to 'finished' first
+                 // Use .eq('status', 'active') to prevent race conditions if already finished/cancelled
+                 const { error: gameUpdateError } = await supabase.from('games')
+                     .update(updatePayload)
+                     .eq('id', gameData.id)
+                     .eq('status', 'active'); // *** Crucial check ***
+
+                 if (gameUpdateError) {
+                     // If the error indicates the row was not found (likely because status was already changed), log it but don't throw hard error
+                     if (gameUpdateError.code === 'PGRST116' || gameUpdateError.details?.includes("violates row-level security policy")) { // Needs RLS check potentially
+                          console.warn(`Game ${gameData.id} likely already finished/cancelled by another client. Error:`, gameUpdateError.message);
+                          // Fetch latest game state to navigate correctly
+                          const { data: latestGameData } = await supabase.from('games').select('*').eq('id', gameData.id).single();
+                          if (latestGameData && latestGameData.status === 'finished') {
+                              navigateTo('end');
+                              renderGameEnd(latestGameData);
+                          } else {
+                             navigateTo('main'); // Fallback
+                             fetchGames();
+                          }
+                          return; // Stop further processing
+                     } else {
+                         throw gameUpdateError; // Throw other DB errors
+                     }
+                 }
+
+                 console.log(`Game ${gameData.id} status updated to finished.`);
+
+                 // Update player stats asynchronously (don't block UI)
+                 const playersToUpdate = [...(gameData.team_a || []), ...(gameData.team_b || [])];
+                 if (playersToUpdate.length > 0) {
+                     updatePlayerStats(playersToUpdate, mvpUserId); // Fire-and-forget style
+                 } else {
+                    console.warn("No players found in teams for stat updates.");
+                 }
+
+                // Navigation to end screen should happen via realtime subscription update for consistency.
+                // The subscription will see the status change to 'finished'.
+
+            } catch (error) {
+                 console.error("End game process error:", error);
+                 // Try to show an error on the active screen if still there
+                 if (currentScreen === 'active') {
+                     setScoreErrorMessage("Error finalizing game. Please check game list.");
+                 }
+                 // Consider navigating back to main list as a fallback
+                 // navigateTo('main'); fetchGames();
+            }
+        };
+
+        // Helper function to update stats (run async, no waiting)
+        const updatePlayerStats = async (players, mvpUserId) => {
+            console.log("Updating stats for players:", players.map(p => p.username));
+            const statPromises = players.map(async (player) => {
+                 try {
+                     // Fetch the player's current profile for stats
+                     // Use SELECT with specific columns for efficiency
+                     const { data: profile, error: fetchError } = await supabase
+                         .from('profiles')
+                         .select('games_played, total_points_scored, mvp_awards')
+                         .eq('user_id', player.user_id)
+                         .single();
+
+                     if (fetchError && fetchError.code !== 'PGRST116') { // Ignore 'not found' error here, just log
+                        console.warn(`Could not fetch profile for stat update (User ID: ${player.user_id}):`, fetchError.message);
+                        return; // Skip update if profile fetch fails badly
+                     }
+                     if (!profile) {
+                         console.warn(`Profile not found for stat update (User ID: ${player.user_id}). Skipping.`);
+                         return; // Skip update if profile doesn't exist
+                     }
+
+
+                     // Calculate updates
+                     const isMvp = player.user_id === mvpUserId;
+                     const updates = {
+                         games_played: (profile.games_played || 0) + 1,
+                         // Basic points: +5 for playing, +10 bonus for MVP
+                         total_points_scored: (profile.total_points_scored || 0) + 5 + (isMvp ? 10 : 0),
+                         mvp_awards: (profile.mvp_awards || 0) + (isMvp ? 1 : 0)
+                     };
+
+                     // Perform the update
+                     const { error: updateError } = await supabase
+                        .from('profiles')
+                        .update(updates)
+                        .eq('user_id', player.user_id);
+
+                     if (updateError) {
+                         console.error(`Failed to update stats for ${player.username || player.user_id}:`, updateError.message);
+                     } else {
+                        // console.log(`Stats updated for ${player.username || player.user_id}`); // Less verbose
+                     }
+                 } catch(statErr) {
+                     console.error(`Exception during stat update for ${player.username || player.user_id}:`, statErr);
+                 }
+            });
+
+            try {
+                await Promise.all(statPromises);
+                console.log("Finished attempting player stat updates.");
+            } catch (e) {
+                console.error("Error occurred during Promise.all for stat updates:", e);
+            }
+        };
+
+        const sendChatMessage = async (msg) => {
+            if (!supabase || !currentUser || !currentGameData || !msg.trim()) return;
+            // Ensure message can only be sent in pending or active games
+            if (!['pending', 'active'].includes(currentGameData.status)) {
+                alert("Chat is only available for pending or active games.");
+                return;
+            }
+            // Ensure user profile and username are available
+            if (!userProfile?.username) {
+                userProfile = await getUserProfile(currentUser.id);
+                if (!userProfile?.username) {
+                    alert("Please set a username in your profile to send chat messages.");
+                    return;
+                }
+            }
+
+            const newMsg = {
+                user_id: currentUser.id,
+                username: userProfile.username,
+                message: msg.trim(), // Use trimmed message
+                timestamp: new Date().toISOString()
+            };
+
+            // Optimistic UI update: Add message locally first
+            const currentLog = currentGameData.chat_log || [];
+            const updatedLog = [...currentLog, newMsg];
+            renderChatMessages(updatedLog); // Render the optimistic update
+            scrollToChatBottom(); // Scroll down
+            chatInput.value = ''; // Clear input field
+
+            // Attempt to update the database
+            try {
+                const { error } = await supabase.from('games')
+                    .update({ chat_log: updatedLog })
+                    .eq('id', currentGameId);
+
+                if (error) {
+                    // Rollback optimistic update on error? More complex.
+                    // For now, just log error and maybe show an alert.
+                    console.error("Chat send error:", error);
+                    alert("Failed to send message. Please try again.");
+                    // Restore input field content?
+                    chatInput.value = msg;
+                    // Re-render with previous log to remove optimistic message?
+                    renderChatMessages(currentLog);
+                    // Need to decide on rollback strategy. Simple alert is easiest.
+                } else {
+                    // Update local game data if DB update succeeds (though realtime should also do this)
+                    currentGameData.chat_log = updatedLog;
+                }
+            } catch (e) {
+                 console.error("Chat send exception:", e);
+                 alert("An error occurred while sending the message.");
+                 chatInput.value = msg; // Restore input
+                 renderChatMessages(currentLog); // Restore previous chat log
+            }
+        };
+        const fetchProfileData = async (userId) => {
+            if (!supabase) return;
+            showElement(profileLoader); hideElement(profileContent);
+            try {
+                 const profile = await getUserProfile(userId);
+                 if (profile) {
+                     renderProfile(profile);
+                 } else {
+                     // Handle case where profile is null (user exists but no profile row)
+                     console.warn(`Profile data not found for user ${userId}. Displaying basic info.`);
+                     // Render a minimal profile or error state
+                     profileContent.innerHTML = `<p class="p-2 text-center">Profile not fully set up. Email: ${currentUser?.email || 'N/A'}</p><p class="p-2 text-center"><button id="setup-profile-btn" class="btn-primary">Set Up Profile</button></p>`;
+                     showElement(profileContent);
+                     hideElement(profileLoader);
+                     // Add event listener for setup button if needed
+                 }
+            } catch (e) {
+                 console.error("Profile load error:", e);
+                 hideElement(profileLoader);
+                 profileContent.innerHTML = `<p class="error-text p-2 text-center">Failed to load profile: ${e.message}</p>`;
+                 showElement(profileContent);
+            }
+        };
+        const loadGameHistory = async (userId) => {
+            if (!supabase || !userId) return;
+            showElement(gameHistoryLoader); hideElement(noHistoryMessage); gameHistoryList.innerHTML = '';
+            try {
+                // Fetch games where status is finished and the user was in team_a OR team_b
+                // This requires checking array containment, which can be done with `cs` (contains) or `or` filter
+                const { data, error } = await supabase
+                    .from('games')
+                    .select('*')
+                    .eq('status', 'finished')
+                    // Filter where team_a contains user OR team_b contains user
+                    // Note: Supabase JS v2 doesn't have direct JSON array contains query support like SQL.
+                    // We might have to fetch more games and filter client-side, or use an RPC function.
+                    // Let's fetch recent finished games and filter client-side for simplicity.
+                    .order('created_at', { ascending: false })
+                    .limit(50); // Limit the number of games fetched
+
+                if (error) throw error;
+
+                // Filter client-side
+                const userHistory = data.filter(game =>
+                    game.team_a?.some(player => player.user_id === userId) ||
+                    game.team_b?.some(player => player.user_id === userId)
+                );
+
+                renderGameHistory(userHistory);
+            } catch (e) {
+                 console.error("Load game history error:", e);
+                 hideElement(gameHistoryLoader);
+                 showElement(noHistoryMessage);
+                 noHistoryMessage.textContent = "Failed to load game history.";
+            }
+        };
 
         // Updated fetchLeaderboard
         const fetchLeaderboard = async (scope = 'global') => {
-             if (!supabase) return; leaderboardScope = scope; showElement(leaderboardLoader); hideElement(noLeaderboardMessage); leaderboardList.innerHTML = '';
-             let statusText = 'Showing Global Leaders'; leaderboardFilterValue = null;
+             if (!supabase) return;
+             leaderboardScope = scope; // Update state
+             showElement(leaderboardLoader); hideElement(noLeaderboardMessage); leaderboardList.innerHTML = '';
+
+             let statusText = 'Showing Global Leaders (Top 50 by Points)';
+             leaderboardFilterValue = null; // Reset filter value
+
+             // Prepare query based on scope
+             let query = supabase.from('profiles')
+                .select('user_id, username, total_points_scored, games_played, mvp_awards, city, state, country')
+                .gt('total_points_scored', 0) // Optionally filter out users with 0 points
+                .order('total_points_scored', { ascending: false, nullsLast: true }) // Order by points
+                .limit(50); // Limit results
+
+
+             // Apply scope filters if not global
              if (scope !== 'global') {
-                 if (!userProfile) userProfile = await getUserProfile(currentUser?.id);
-                 if (!userProfile) { leaderboardStatus.textContent = 'Load profile first.'; hideElement(leaderboardLoader); showElement(noLeaderboardMessage); noLeaderboardMessage.textContent = "Profile missing."; return; }
-                 if (scope === 'country') { if (!userProfile.country) { noLeaderboardMessage.textContent = "Set Country."; showElement(noLeaderboardMessage); hideElement(leaderboardLoader); return; } leaderboardFilterValue = userProfile.country; statusText = `Leaders in ${userProfile.country}`; }
-                 else if (scope === 'state') { if (!userProfile.state || !userProfile.country) { noLeaderboardMessage.textContent = "Set State & Country."; showElement(noLeaderboardMessage); hideElement(leaderboardLoader); return; } leaderboardFilterValue = userProfile.state; statusText = `Leaders in ${userProfile.state}, ${userProfile.country}`; }
-                 else if (scope === 'city') { if (!userProfile.city || !userProfile.state || !userProfile.country) { noLeaderboardMessage.textContent = "Set City, State & Country."; showElement(noLeaderboardMessage); hideElement(leaderboardLoader); return; } leaderboardFilterValue = userProfile.city; statusText = `Leaders in ${userProfile.city}, ${userProfile.state}`; }
+                 // Ensure user profile is loaded for location data
+                 if (!userProfile) {
+                     userProfile = await getUserProfile(currentUser?.id);
+                 }
+                 // Check if profile exists and has necessary location fields
+                 if (!userProfile) {
+                     leaderboardStatus.textContent = 'Your profile is needed for local leaderboards.';
+                     hideElement(leaderboardLoader); showElement(noLeaderboardMessage); noLeaderboardMessage.textContent = "Load your profile to see local leaderboards.";
+                     return;
+                 }
+
+                 if (scope === 'country') {
+                     if (!userProfile.country) { noLeaderboardMessage.textContent = "Set your Country in your profile to use this filter."; showElement(noLeaderboardMessage); hideElement(leaderboardLoader); return; }
+                     leaderboardFilterValue = userProfile.country;
+                     query = query.eq('country', leaderboardFilterValue); // Add country filter
+                     statusText = `Top 50 Leaders in ${userProfile.country}`;
+                 }
+                 else if (scope === 'state') {
+                     if (!userProfile.state || !userProfile.country) { noLeaderboardMessage.textContent = "Set your State & Country in your profile."; showElement(noLeaderboardMessage); hideElement(leaderboardLoader); return; }
+                     leaderboardFilterValue = userProfile.state;
+                     // Filter by both state and country for accuracy
+                     query = query.eq('country', userProfile.country).eq('state', userProfile.state);
+                     statusText = `Top 50 Leaders in ${userProfile.state}, ${userProfile.country}`;
+                 }
+                 else if (scope === 'city') {
+                     if (!userProfile.city || !userProfile.state || !userProfile.country) { noLeaderboardMessage.textContent = "Set your City, State & Country in your profile."; showElement(noLeaderboardMessage); hideElement(leaderboardLoader); return; }
+                     leaderboardFilterValue = userProfile.city;
+                     // Filter by city, state, and country
+                     query = query.eq('country', userProfile.country).eq('state', userProfile.state).eq('city', userProfile.city);
+                     statusText = `Top 50 Leaders in ${userProfile.city}, ${userProfile.state}`;
+                 }
              }
-             leaderboardStatus.textContent = statusText;
+             leaderboardStatus.textContent = statusText; // Update status text
+
              try {
-                 let query = supabase.from('profiles').select('user_id, username, total_points_scored, games_played, mvp_awards, city, state, country');
-                 if (scope === 'country' && leaderboardFilterValue) query = query.eq('country', leaderboardFilterValue);
-                 else if (scope === 'state' && userProfile.state && userProfile.country) query = query.eq('country', userProfile.country).eq('state', userProfile.state);
-                 else if (scope === 'city' && userProfile.city && userProfile.state && userProfile.country) query = query.eq('country', userProfile.country).eq('state', userProfile.state).eq('city', userProfile.city);
-                 query = query.order('total_points_scored', { ascending: false, nullsFirst: false }).limit(50);
-                 const { data, error } = await query; if (error) throw error; renderLeaderboard(data);
-             } catch (e) { console.error("Leaderboard error:", e); hideElement(leaderboardLoader); showElement(noLeaderboardMessage); noLeaderboardMessage.textContent = `Load fail: ${scope}.`; leaderboardStatus.textContent = `Error: ${scope}.`; }
+                 const { data, error } = await query; // Execute the prepared query
+                 if (error) throw error;
+                 renderLeaderboard(data);
+             } catch (e) {
+                 console.error(`Leaderboard fetch error (scope: ${scope}):`, e);
+                 hideElement(leaderboardLoader);
+                 showElement(noLeaderboardMessage);
+                 noLeaderboardMessage.textContent = `Failed to load ${scope} leaderboard.`;
+                 leaderboardStatus.textContent = `Error loading ${scope} leaderboard.`;
+             }
          };
 
         // --- REALTIME SUBSCRIPTIONS ---
-        const subscribeToGamesList = () => { if (!supabase || gamesSubscription) return; console.log("Subscribing Games List..."); gamesSubscription = supabase.channel('public:games-list').on('postgres_changes', { event: '*', schema: 'public', table: 'games' }, (p) => { console.log('List change!', p); if (currentScreen === 'main') fetchGames(); }).subscribe((s, e) => { if(s==='SUBSCRIBED') console.log('List subscribed!'); else if(s==='CHANNEL_ERROR'||s==='TIMED_OUT') console.error('List sub error:', s, e); else if(s==='CLOSED') console.log('List sub closed.'); }); };
-        const unsubscribeFromGamesList = () => { if (gamesSubscription) { console.log("Unsub List."); supabase.removeChannel(gamesSubscription).catch(e=>console.error("Remove list chan err:",e)); gamesSubscription = null; } };
-        const subscribeToGame = (gameId) => { if (!supabase || !gameId || gameSubscription) return; console.log(`Subscribing Game ${gameId}...`); const chan=`game-${gameId}`; gameSubscription=supabase.channel(chan).on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'games', filter: `id=eq.${gameId}` }, (p) => { console.log(`Game ${gameId} update!`, p); const uG=p.new; const oG=p.old; currentGameData=uG; if (currentScreen==='detail'){if(uG.status==='pending')renderGameDetail(uG); else if(uG.status==='active'){navigateTo('active');renderActiveGame(uG);} else if(uG.status==='finished'){navigateTo('end');renderGameEnd(uG);} else if(uG.status==='cancelled'){alert("Cancelled.");navigateTo('main');fetchGames();}} else if(currentScreen==='active'){if(uG.status==='active'){renderActiveGame(uG);checkAndApplyScore(uG);} else if(uG.status==='finished'){navigateTo('end');renderGameEnd(uG);} else if(uG.status==='cancelled'){alert("Cancelled.");navigateTo('main');fetchGames();}} if (JSON.stringify(uG.chat_log)!==JSON.stringify(oG?.chat_log)&&(currentScreen==='detail'||currentScreen==='active')){renderChatMessages(uG.chat_log||[]);}}).subscribe((s,e)=>{if(s==='SUBSCRIBED')console.log(`Game ${gameId} subscribed!`); else if(s==='CHANNEL_ERROR'||s==='TIMED_OUT'){console.error(`Game ${gameId} sub error:`,s,e);if(currentScreen==='detail'||currentScreen==='active')alert("Realtime lost.");} else if(s==='CLOSED')console.log(`Game ${gameId} sub closed.`);}); };
-        const unsubscribeFromGame = () => { if (gameSubscription) { const cN=gameSubscription.channelName; console.log(`Unsub ${cN}.`); supabase.removeChannel(gameSubscription).catch(e=>console.error(`Remove ${cN} err:`,e)); gameSubscription = null; } };
+        const subscribeToGamesList = () => {
+            if (!supabase || gamesSubscription) return; // Already subscribed
+            console.log("Subscribing to Games List changes...");
+            const channelName = 'public:games-list';
+            gamesSubscription = supabase.channel(channelName)
+                .on('postgres_changes',
+                    { event: '*', schema: 'public', table: 'games' },
+                    (payload) => {
+                        console.log('Games list change detected:', payload.eventType, payload.new?.id || payload.old?.id);
+                        // Re-fetch the entire list on any change for simplicity
+                        // Could optimize to update/insert/delete specific item later if needed
+                        if (currentScreen === 'main') {
+                             console.log("Refreshing game list due to change.");
+                             fetchGames(); // Re-fetch and re-render
+                        }
+                    }
+                )
+                .subscribe((status, err) => {
+                    if (status === 'SUBSCRIBED') {
+                        console.log(`Successfully subscribed to ${channelName}!`);
+                    } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+                        console.error(`Subscription error on ${channelName}:`, status, err);
+                        // REMOVED Alert: Don't show pop-up
+                        // alert("Realtime connection issue with game list.");
+                    } else if (status === 'CLOSED') {
+                        console.log(`Subscription closed for ${channelName}.`);
+                    }
+                });
+        };
+        const unsubscribeFromGamesList = () => {
+            if (gamesSubscription) {
+                 console.log("Unsubscribing from Games List.");
+                 supabase.removeChannel(gamesSubscription)
+                    .catch(e => console.error("Error removing games list channel:", e));
+                 gamesSubscription = null;
+            }
+        };
+        const subscribeToGame = (gameId) => {
+            if (!supabase || !gameId || gameSubscription) {
+                // If already subscribed, ensure it's for the *correct* gameId
+                if (gameSubscription && gameSubscription.channelName !== `game-${gameId}`) {
+                     console.log(`Switching game subscription from ${gameSubscription.channelName} to game-${gameId}`);
+                     unsubscribeFromGame(); // Unsubscribe from old game first
+                } else if (gameSubscription) {
+                     console.log(`Already subscribed to game-${gameId}.`);
+                     return; // Already subscribed to the correct game
+                } else {
+                    return; // No supabase or gameId provided
+                }
+            }
+
+            console.log(`Subscribing to Game ${gameId} changes...`);
+            const channelName = `game-${gameId}`;
+            gameSubscription = supabase.channel(channelName)
+                .on('postgres_changes',
+                    {
+                        event: 'UPDATE', // Listen only for updates on the specific game
+                        schema: 'public',
+                        table: 'games',
+                        filter: `id=eq.${gameId}` // Filter for this specific game ID
+                    },
+                    (payload) => {
+                        console.log(`Game ${gameId} UPDATE received:`, payload.new.status);
+                        const updatedGame = payload.new;
+                        const oldGame = payload.old; // Can be useful for comparison
+                        currentGameData = updatedGame; // Update global state immediately
+
+                        // --- Handle Game State Transitions ---
+                        if (currentScreen === 'detail') {
+                            if (updatedGame.status === 'pending') {
+                                renderGameDetail(updatedGame); // Re-render detail screen
+                            } else if (updatedGame.status === 'active') {
+                                console.log("Game started, navigating to active screen.");
+                                navigateTo('active'); // Navigate first
+                                renderActiveGame(updatedGame); // Then render
+                            } else if (updatedGame.status === 'finished' || updatedGame.status === 'cancelled') {
+                                console.log(`Game ${updatedGame.status}, navigating to end screen.`);
+                                navigateTo('end');
+                                renderGameEnd(updatedGame);
+                            }
+                        } else if (currentScreen === 'active') {
+                            if (updatedGame.status === 'active') {
+                                renderActiveGame(updatedGame); // Update active screen (scores, timer, etc.)
+                                checkAndApplyScore(updatedGame); // Check if score update needs applying
+                            } else if (updatedGame.status === 'finished' || updatedGame.status === 'cancelled') {
+                                console.log(`Game ${updatedGame.status} while on active screen, navigating to end.`);
+                                navigateTo('end');
+                                renderGameEnd(updatedGame);
+                            }
+                        }
+
+                        // --- Handle Chat Updates ---
+                        // Compare chat logs to avoid unnecessary renders if only score changed, etc.
+                         if (JSON.stringify(updatedGame.chat_log) !== JSON.stringify(oldGame?.chat_log)) {
+                            if (chatDrawer.classList.contains('open') && ['detail', 'active'].includes(currentScreen)) {
+                                console.log("Chat log updated, rendering messages.");
+                                renderChatMessages(updatedGame.chat_log || []);
+                            }
+                         }
+                    }
+                )
+                .subscribe((status, err) => {
+                    if (status === 'SUBSCRIBED') {
+                        console.log(`Successfully subscribed to ${channelName}!`);
+                    } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+                        console.error(`Subscription error on ${channelName}:`, status, err);
+                        // REMOVED Alert: Don't show pop-up
+                        if (['detail', 'active'].includes(currentScreen)) {
+                             // Maybe show a subtle indicator instead of alert?
+                             console.warn("Realtime connection lost for current game.");
+                             // Example: Show a small non-blocking message
+                             // setScoreErrorMessage("Connection issue, updates may be delayed.");
+                        }
+                    } else if (status === 'CLOSED') {
+                         console.log(`Subscription closed for ${channelName}.`);
+                    }
+                });
+        };
+        const unsubscribeFromGame = () => {
+            if (gameSubscription) {
+                 const channelName = gameSubscription.channelName;
+                 console.log(`Unsubscribing from ${channelName}.`);
+                 supabase.removeChannel(gameSubscription)
+                    .catch(e => console.error(`Error removing channel ${channelName}:`, e));
+                 gameSubscription = null;
+            }
+        };
 
         // --- AUTHENTICATION LOGIC ---
-        const handleAuth = async (event) => { event.preventDefault(); if (!supabase) return; const isSignUp = authSubmitBtn.textContent === 'Sign Up'; const email = emailInput.value.trim(); const password = passwordInput.value; const uname = usernameInput.value.trim(); authError.textContent = ''; disableElement(authSubmitBtn); let opError = null; try { if (isSignUp) { if (!uname || uname.length < 3) throw new Error("Username >= 3 chars."); const { data: sData, error: sError } = await supabase.auth.signUp({ email, password }); if (sError) throw sError; if (!sData.user) throw new Error("Signup ok, no user data."); console.log("Signup ok:", sData.user.id); const { data: pData, error: pError } = await createInitialUserProfile(sData.user.id, email, uname); if (pError) throw new Error(`Account created, profile fail: ${pError.message}. Check email & login.`); userProfile = pData; currentUser = sData.user; alert("Signup ok! Check email verification."); authForm.reset(); } else { const { data: siData, error: siError } = await supabase.auth.signInWithPassword({ email, password }); if (siError) { if (siError.message.includes("Email not confirmed")) opError = new Error("Confirm email first."); else throw siError; } else if (siData.user) { currentUser = siData.user; await checkUserSession(); } else { throw new Error("Login fail: No user data."); } } } catch (e) { console.error('Auth error:', e); opError = e; } finally { if (opError) authError.textContent = opError.message || 'Error.'; if (!opError || !opError.message.includes("Confirm email")) enableElement(authSubmitBtn); } };
-        const handleLogout = async () => { if (!supabase) return; console.log("Logging out..."); unsubscribeFromGame(); unsubscribeFromGamesList(); currentGameId = null; currentGameData = null; const { error } = await supabase.auth.signOut(); if (error) { console.error("Logout error:", error); alert("Logout error."); } else { currentUser = null; userProfile = null; leaderboardScope = 'global'; navigateTo('auth'); authTitle.textContent = 'Login'; authSubmitBtn.textContent = 'Login'; authToggleText.textContent = "No account?"; authToggleBtn.textContent = 'Sign Up'; hideElement(usernameField); authForm.reset(); authError.textContent = ''; console.log("Logged out."); } };
-        const toggleAuthMode = () => { const isSignUp = authSubmitBtn.textContent === 'Sign Up'; if (isSignUp) { authTitle.textContent = 'Login'; authSubmitBtn.textContent = 'Login'; authToggleText.textContent = "No account?"; authToggleBtn.textContent = 'Sign Up'; hideElement(usernameField); } else { authTitle.textContent = 'Sign Up'; authSubmitBtn.textContent = 'Sign Up'; authToggleText.textContent = 'Have account?'; authToggleBtn.textContent = 'Login'; showElement(usernameField); } authError.textContent = ''; authForm.reset(); enableElement(authSubmitBtn); };
-        const checkUserSession = async () => { if (!supabase) { navigateTo('auth'); hideElement(screens.loading); return; } try { console.log("Checking session..."); const { data: { session }, error } = await supabase.auth.getSession(); if (error) { console.error("Get session error:", error); navigateTo('auth'); } else if (session?.user) { currentUser = session.user; console.log("Session found:", currentUser.id); if (!userProfile || userProfile.user_id !== currentUser.id) userProfile = await getUserProfile(currentUser.id); if (!userProfile) { console.warn("Profile missing:", currentUser.id); alert("Profile data missing."); if(currentScreen === 'auth' || currentScreen === 'loading') { navigateTo('main'); fetchGames(); } } else { console.log("Profile loaded:", userProfile.username); if (currentScreen === 'auth' || currentScreen === 'loading') { navigateTo('main'); fetchGames(); } } } else { console.log("No active session."); if (currentScreen !== 'auth') navigateTo('auth'); } } catch (err) { console.error("Session check error:", err); if (currentScreen !== 'auth') navigateTo('auth'); } finally { hideElement(screens.loading); } };
+        const handleAuth = async (event) => {
+            event.preventDefault(); if (!supabase) return;
+            const isSignUp = authSubmitBtn.textContent === 'Sign Up';
+            const emailValue = emailInput.value.trim();
+            const passwordValue = passwordInput.value;
+            const usernameValue = usernameInput.value.trim();
+            authError.textContent = ''; // Clear previous errors
+            disableElement(authSubmitBtn); // Prevent double submission
+
+            let operationError = null;
+
+            try {
+                if (isSignUp) {
+                    // Sign Up Logic
+                    if (!usernameValue || usernameValue.length < 3) {
+                        throw new Error("Username must be at least 3 characters long.");
+                    }
+                    if (!passwordValue || passwordValue.length < 6) {
+                        // Enforce Supabase default password length
+                        throw new Error("Password must be at least 6 characters long.");
+                    }
+
+                    // 1. Attempt Auth Signup
+                    const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+                        email: emailValue,
+                        password: passwordValue,
+                    });
+
+                    if (signUpError) {
+                        // Handle specific auth errors cleanly
+                        if (signUpError.message.includes("User already registered")) {
+                             throw new Error("An account with this email already exists. Try logging in.");
+                        } else if (signUpError.message.includes("Password should be at least 6 characters")) {
+                             throw new Error("Password must be at least 6 characters long.");
+                        }
+                        throw signUpError; // Throw other auth errors
+                    }
+
+                    // Check if user object exists (it might not if email confirmation is required by Supabase settings)
+                    // For this app, we assume email confirmation is OFF or we handle login post-verification separately.
+                    if (!signUpData.user) {
+                        // This might happen if email verification is ON in Supabase settings.
+                        // Since the request was to REMOVE the verification alert, we proceed as if successful,
+                        // but profile creation might fail if the user doesn't exist yet in auth.users.
+                        // Let's proceed assuming verification is off or handled implicitly.
+                        console.warn("Auth signup successful, but user object might be pending verification (if enabled).");
+                        // If verification IS enabled, the profile insert might fail until confirmed.
+                        // For now, assume it's okay to proceed.
+                    }
+
+                    // Get the user ID (handle potential null user object)
+                    const userId = signUpData.user?.id;
+                    if (!userId) {
+                        // This is problematic if we need the ID immediately for profile creation.
+                        throw new Error("Signup succeeded but could not get user ID immediately. Please try logging in.");
+                    }
+
+                    console.log("Auth Signup successful for:", userId);
+
+                    // 2. Attempt Profile Creation (associates username, etc.)
+                    const { data: profileData, error: profileError } = await createInitialUserProfile(userId, emailValue, usernameValue);
+
+                    if (profileError) {
+                         // Inform user if profile creation failed (e.g., username taken)
+                         // Potentially delete the auth user if profile fails critically? Complex rollback.
+                         console.error("Profile creation failed after signup:", profileError);
+                         throw new Error(`Account created, but profile setup failed: ${profileError.message}. You may need to contact support or try logging in.`);
+                    }
+
+                    // Profile created successfully
+                    userProfile = profileData; // Store created profile
+                    currentUser = signUpData.user; // Store the new user
+
+                    // REMOVED Email Verification Alert
+                    // alert("Signup successful! Check email for verification.");
+                    alert("Signup successful! You can now log in."); // Changed alert
+                    authForm.reset(); // Clear form
+                    toggleAuthMode(); // Switch back to login mode
+
+                } else {
+                    // Login Logic
+                    const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+                        email: emailValue,
+                        password: passwordValue,
+                    });
+
+                    if (signInError) {
+                         // Handle common login errors
+                         if (signInError.message.includes("Invalid login credentials")) {
+                             throw new Error("Incorrect email or password.");
+                         } else if (signInError.message.includes("Email not confirmed")) {
+                             // Even though verification alert removed, handle if Supabase setting is ON
+                             throw new Error("Your email address hasn't been confirmed yet. Please check your inbox.");
+                         }
+                         throw signInError; // Throw other login errors
+                    }
+
+                    // Login successful
+                    if (signInData.user) {
+                         currentUser = signInData.user;
+                         console.log("Login successful for:", currentUser.id);
+                         // checkUserSession will fetch profile and navigate
+                         await checkUserSession(); // Trigger profile load and navigation immediately
+                    } else {
+                         // Should not happen if error is null, but good to check
+                         throw new Error("Login failed: No user data received.");
+                    }
+                }
+            } catch (e) {
+                 console.error('Authentication error:', e);
+                 operationError = e; // Store error to display
+            } finally {
+                 // Display error message if one occurred
+                 if (operationError) {
+                     authError.textContent = operationError.message || 'An unknown authentication error occurred.';
+                 }
+                 // Re-enable button unless error requires user action (like email confirm)
+                 if (!operationError || !operationError.message.includes("Email not confirmed")) {
+                      enableElement(authSubmitBtn);
+                 }
+            }
+        };
+        const handleLogout = async () => {
+            if (!supabase) return;
+            console.log("Logging out...");
+            unsubscribeFromGame(); // Clean up subscriptions
+            unsubscribeFromGamesList();
+            stopGameTimer(); // Stop game timer if active
+            stopConfetti(); // Stop effects
+            currentGameId = null; currentGameData = null;
+
+            const { error } = await supabase.auth.signOut();
+            if (error) {
+                 console.error("Logout error:", error);
+                 alert("Error logging out."); // Keep alert for critical errors
+            } else {
+                 // Clear local state
+                 currentUser = null;
+                 userProfile = null;
+                 leaderboardScope = 'global'; // Reset leaderboard scope
+                 currentScreen = 'auth'; // Set screen state before navigate
+                 navigateTo('auth'); // Navigate to login screen
+
+                 // Reset Auth Screen UI
+                 authTitle.textContent = 'Login to HoopsLink';
+                 authSubmitBtn.textContent = 'Login';
+                 authToggleText.textContent = "Don't have an account?";
+                 authToggleBtn.textContent = 'Sign Up';
+                 hideElement(usernameField); // Hide username field for login
+                 authForm.reset(); // Clear email/password fields
+                 authError.textContent = ''; // Clear any previous auth errors
+                 enableElement(authSubmitBtn); // Ensure button is enabled
+                 console.log("Logged out successfully.");
+            }
+        };
+        const toggleAuthMode = () => {
+            const isCurrentlySignUp = authSubmitBtn.textContent === 'Sign Up';
+            if (isCurrentlySignUp) {
+                 // Switch to Login mode
+                 authTitle.textContent = 'Login to HoopsLink';
+                 authSubmitBtn.textContent = 'Login';
+                 authToggleText.textContent = "Don't have an account?";
+                 authToggleBtn.textContent = 'Sign Up';
+                 hideElement(usernameField);
+                 usernameInput.required = false; // Make username not required for login
+            } else {
+                 // Switch to Sign Up mode
+                 authTitle.textContent = 'Sign Up for HoopsLink';
+                 authSubmitBtn.textContent = 'Sign Up';
+                 authToggleText.textContent = 'Already have an account?';
+                 authToggleBtn.textContent = 'Login';
+                 showElement(usernameField);
+                 usernameInput.required = true; // Make username required for sign up
+            }
+            // Reset common elements
+            authError.textContent = ''; // Clear any errors
+            authForm.reset(); // Clear input fields
+            enableElement(authSubmitBtn); // Ensure button is enabled
+        };
+        const checkUserSession = async () => {
+            if (!supabase) { navigateTo('auth'); hideElement(screens.loading); return; }
+            try {
+                 console.log("Checking user session...");
+                 const { data: { session }, error } = await supabase.auth.getSession();
+
+                 if (error) {
+                     console.error("Error getting session:", error);
+                     navigateTo('auth'); // Default to auth screen on error
+                 } else if (session?.user) {
+                     // User is logged in
+                     currentUser = session.user;
+                     console.log("Active session found for:", currentUser.id);
+
+                     // Attempt to load profile if not already loaded or if user ID changed
+                     if (!userProfile || userProfile.user_id !== currentUser.id) {
+                         userProfile = await getUserProfile(currentUser.id);
+                         if (!userProfile) {
+                              console.warn("User logged in, but profile data is missing or failed to load for:", currentUser.id);
+                              // Still navigate to main, but profile-dependent features might fail
+                              // Consider navigating to profile screen first?
+                              // alert("Welcome! Your profile isn't fully set up yet."); // Optional user feedback
+                              if (currentScreen === 'auth' || currentScreen === 'loading') {
+                                  navigateTo('main');
+                                  fetchGames(); // Fetch games even without full profile
+                              }
+                         } else {
+                             console.log("User profile loaded:", userProfile.username);
+                             // Navigate to main app if currently on auth/loading
+                             if (currentScreen === 'auth' || currentScreen === 'loading') {
+                                 navigateTo('main');
+                                 fetchGames();
+                             }
+                         }
+                     } else {
+                        // Profile already loaded, just ensure navigation if needed
+                         if (currentScreen === 'auth' || currentScreen === 'loading') {
+                            navigateTo('main');
+                            fetchGames();
+                         }
+                     }
+                 } else {
+                     // No active session, user is logged out
+                     console.log("No active session found.");
+                     if (currentScreen !== 'auth') { // Avoid navigating if already there
+                        handleLogout(); // Use logout function to ensure clean state reset
+                        // navigateTo('auth'); // Handled by handleLogout
+                     }
+                 }
+            } catch (err) {
+                 console.error("Exception during session check:", err);
+                 if (currentScreen !== 'auth') {
+                    navigateTo('auth'); // Fallback to auth on unexpected errors
+                 }
+            } finally {
+                 // Always hide loading screen after check completes
+                 hideElement(screens.loading);
+            }
+        };
 
         // --- EVENT HANDLERS ---
-        function handleGameItemClick(gameId) { console.log("Clicked game:", gameId); currentGameId = gameId; navigateTo('detail'); fetchGameDetails(gameId); }
-        function handleCreateGameSubmit(e) { e.preventDefault(); const loc=document.getElementById('game-location').value; const dt=document.getElementById('game-datetime').value; const btn=e.target.querySelector('button[type="submit"]'); createGameError.textContent=''; disableElement(btn); createGame(loc,dt).then(({data,error})=>{ enableElement(btn); if(error) createGameError.textContent=error.message; else {console.log("Game created:",data);toggleCreateGameModal(false);} }); }
-        function handleJoinLeaveClick() { if(!currentGameId)return; const act=joinLeaveGameBtn.textContent; if(act==='Join Game')joinGame(currentGameId); else if(act==='Leave Game'&&confirm("Leave?"))leaveGame(currentGameId); }
-        function handleBeginGameClick() { if(!currentGameId)return; const MIN_PLAYERS_TO_START = 4; if(confirm(`Start with ${currentGameData?.players?.length||0} players? Min ${MIN_PLAYERS_TO_START}.`)) beginGame(currentGameId); } // Updated confirmation
-        function handleCancelGameClick() { if(!currentGameId)return; cancelGame(currentGameId); }
-        function handleScoreClick(e) { if(!e.target.classList.contains('score'))return; const t=e.target.dataset.team; proposeScore(t); }
-        function handleProfileUpdate(e) { e.preventDefault(); const nu=editProfileUsernameInput.value.trim(); const nc=editProfileCityInput.value.trim(); const ns=editProfileStateInput.value.trim(); const nco=editProfileCountryInput.value.trim(); profileUpdateError.textContent=''; profileUpdateMessage.textContent=''; if(!nu||nu.length<3){profileUpdateError.textContent="Username >= 3 chars.";return;} const up={}; if(userProfile&&nu!==userProfile.username)up.username=nu; if(userProfile&&nc!==(userProfile.city||''))up.city=nc||null; if(userProfile&&ns!==(userProfile.state||''))up.state=ns||null; if(userProfile&&nco!==(userProfile.country||''))up.country=nco||null; if(Object.keys(up).length===0){toggleProfileEdit(false);return;} disableElement(saveProfileBtn); updateUserProfile(currentUser.id,up).then(({data,error})=>{enableElement(saveProfileBtn);if(error){console.error("Profile update error:",error);profileUpdateError.textContent=`Update failed: ${error.message}`;}else{userProfile=data;renderProfile(userProfile);profileUpdateMessage.textContent="Profile updated!";toggleProfileEdit(false);setTimeout(()=>profileUpdateMessage.textContent='',3000);}}); }
-        function handleSendChat(e) { e.preventDefault(); const msg = chatInput.value; sendChatMessage(msg); }
-        function handleLeaderboardFilterClick(e) { if (!e.target.matches('#leaderboard-filters button')) return; const scope = e.target.dataset.scope; leaderboardFilters.querySelectorAll('button').forEach(b => b.classList.remove('active')); e.target.classList.add('active'); fetchLeaderboard(scope); }
+        function handleGameItemClick(gameId) {
+            console.log("Clicked game:", gameId);
+            currentGameId = gameId; // Set current game ID
+             // Navigate first to show loading state quickly if needed
+            navigateTo('detail');
+             // Fetch details, which will handle further navigation/rendering based on game status
+            fetchGameDetails(gameId);
+        }
+        function handleCreateGameSubmit(e) {
+            e.preventDefault();
+            const location = document.getElementById('game-location').value;
+            const datetime = document.getElementById('game-datetime').value;
+            const submitButton = e.target.querySelector('button[type="submit"]');
+            createGameError.textContent = ''; // Clear previous errors
+            disableElement(submitButton);
+
+            createGame(location, datetime).then(({data, error}) => {
+                enableElement(submitButton); // Re-enable button
+                if (error) {
+                    console.error("Create game submit error:", error);
+                    createGameError.textContent = error.message || "Failed to create game.";
+                } else {
+                    console.log("Game created successfully:", data);
+                    toggleCreateGameModal(false); // Close modal
+                    // Optionally navigate to the new game's detail screen?
+                    // handleGameItemClick(data.id);
+                    // Or just refresh the list (will happen via realtime anyway)
+                    if (currentScreen === 'main') {
+                        fetchGames(); // Trigger manual refresh for faster UI update?
+                    }
+                }
+            });
+        }
+        function handleJoinLeaveClick() {
+            if (!currentGameId || !currentGameData || currentGameData.status !== 'pending') return; // Only for pending games
+            const action = joinLeaveGameBtn.textContent.trim();
+            if (action === 'Join Game') {
+                 joinGame(currentGameId);
+            } else if (action === 'Leave Game') {
+                 // Add confirmation for leaving
+                 if (confirm("Are you sure you want to leave this game?")) {
+                     leaveGame(currentGameId);
+                 }
+            }
+        }
+        function handleBeginGameClick() {
+            if (!currentGameId || !currentGameData || currentGameData.status !== 'pending') return;
+            const players = currentGameData.players || [];
+            // Confirmation message includes player count check
+            if (confirm(`Start the game with ${players.length} players? (Requires ${MIN_PLAYERS_TO_START})`)) {
+                beginGame(currentGameId);
+            }
+        }
+        function handleCancelGameClick() {
+            if (!currentGameId || !currentGameData || currentGameData.status !== 'pending') return;
+            // Confirmation is handled within cancelGame function
+            cancelGame(currentGameId);
+        }
+        function handleScoreClick(e) {
+            // Only trigger if the clicked element *is* a score div
+            if (e.target.matches('.score')) {
+                const team = e.target.dataset.team; // Get 'A' or 'B' from data-team attribute
+                if (team) {
+                    proposeScore(team);
+                }
+            }
+        }
+        function handleProfileUpdate(e) {
+            e.preventDefault();
+            const newUsername = editProfileUsernameInput.value.trim();
+            const newCity = editProfileCityInput.value.trim();
+            const newState = editProfileStateInput.value.trim();
+            const newCountry = editProfileCountryInput.value.trim();
+            profileUpdateError.textContent = ''; profileUpdateMessage.textContent = '';
+
+            if (!newUsername || newUsername.length < 3) {
+                 profileUpdateError.textContent = "Username must be at least 3 characters."; return;
+            }
+
+            // Build the update payload only with changed values
+            const updates = {};
+            if (userProfile && newUsername !== userProfile.username) updates.username = newUsername;
+            if (userProfile && newCity !== (userProfile.city || '')) updates.city = newCity || null; // Use null if cleared
+            if (userProfile && newState !== (userProfile.state || '')) updates.state = newState || null;
+            if (userProfile && newCountry !== (userProfile.country || '')) updates.country = newCountry || null;
+
+            if (Object.keys(updates).length === 0) {
+                // No changes detected
+                toggleProfileEdit(false); // Just switch back to display mode
+                return;
+            }
+
+            disableElement(saveProfileBtn);
+            updateUserProfile(currentUser.id, updates).then(({data, error}) => {
+                enableElement(saveProfileBtn);
+                if (error) {
+                    console.error("Profile update error:", error);
+                    profileUpdateError.textContent = `Update failed: ${error.message}`;
+                    // Check for specific errors like username taken
+                    if (error.code === '23505' && error.message.includes('profiles_username_key')) {
+                         profileUpdateError.textContent = "Update failed: That username is already taken.";
+                    }
+                } else {
+                    userProfile = data; // Update local profile cache
+                    renderProfile(userProfile); // Re-render profile with new data
+                    profileUpdateMessage.textContent = "Profile updated successfully!";
+                    toggleProfileEdit(false); // Switch back to display mode
+                    setTimeout(() => { profileUpdateMessage.textContent = ''; }, 3000); // Clear success message
+                }
+            });
+        }
+        function handleSendChat(e) {
+            e.preventDefault(); // Prevent form submission if wrapped in form
+            const msg = chatInput.value;
+            sendChatMessage(msg); // Call the async chat send function
+        }
+        function handleLeaderboardFilterClick(e) {
+            if (!e.target.matches('#leaderboard-filters button')) return;
+            const scope = e.target.dataset.scope;
+            // Update active button style
+            leaderboardFilters.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+            // Fetch leaderboard for the selected scope
+            fetchLeaderboard(scope);
+        }
+        // General Back Button Handler
+        function handleBackButtonClick() {
+            // Default back action is usually to main screen
+            if (currentScreen === 'profile' || currentScreen === 'leaderboard' || currentScreen === 'detail') {
+                 navigateTo('main');
+                 fetchGames(); // Refresh game list when going back
+            } else {
+                 // Define other back behaviors if needed
+                 console.warn(`Back button clicked on unhandled screen: ${currentScreen}`);
+            }
+        }
 
         // --- UI TOGGLES AND HELPERS ---
-        function toggleCreateGameModal(show) { if(show){createGameModal.classList.add('visible'); document.getElementById('game-location').focus();} else {createGameModal.classList.remove('visible'); createGameForm.reset(); createGameError.textContent='';} }
-        function toggleProfileEdit(editing) { if(editing){hideElement(profileUsernameDisplay); showElement(profileEditFields); showElement(saveProfileBtn); hideElement(editProfileBtn); editProfileUsernameInput.focus();} else {showElement(profileUsernameDisplay); hideElement(profileEditFields); hideElement(saveProfileBtn); showElement(editProfileBtn); profileUpdateError.textContent=''; profileUpdateMessage.textContent='';} }
-        function toggleChatDrawer(open) { if(open){chatDrawer.classList.add('open');scrollToChatBottom();} else {chatDrawer.classList.remove('open');} }
-        function scrollToChatBottom() { requestAnimationFrame(() => { chatMessages.scrollTop = chatMessages.scrollHeight; }); }
-        function showShareModal(txt,url) { const u=url||window.location.href; const t=txt||"Check HoopsLink!"; shareLinkInput.value=u; if(navigator.share){showElement(webShareApiBtn); webShareApiBtn.onclick=async()=>{try{await navigator.share({title:'HoopsLink',text:t,url:u});toggleShareModal(false);}catch(e){console.error('Share err:',e);}};}else{hideElement(webShareApiBtn);} shareModal.classList.add('visible'); }
-        function toggleShareModal(show) { if(!show) shareModal.classList.remove('visible'); }
-        function copyShareLink() { shareLinkInput.select(); shareLinkInput.setSelectionRange(0,99999); try{navigator.clipboard.writeText(shareLinkInput.value).then(()=>{copyShareLinkBtn.textContent='Copied!';setTimeout(()=>{copyShareLinkBtn.textContent='Copy Link';},2000);}).catch(oldCopyFallback);}catch(err){oldCopyFallback();} }
-        function oldCopyFallback() { try{document.execCommand('copy');copyShareLinkBtn.textContent='Copied!';setTimeout(()=>{copyShareLinkBtn.textContent='Copy Link';},2000);}catch(err){console.error('Fallback copy fail:',err);copyShareLinkBtn.textContent='Copy Fail';setTimeout(()=>{copyShareLinkBtn.textContent='Copy Link';},2000);} }
+        function toggleCreateGameModal(show) {
+            if (show) {
+                createGameModal.classList.add('visible');
+                document.getElementById('game-location').focus(); // Focus first field
+                 // Set min date/time to now for datetime-local input
+                const now = new Date();
+                now.setMinutes(now.getMinutes() - now.getTimezoneOffset()); // Adjust for timezone
+                now.setSeconds(0); // Optional: zero out seconds
+                now.setMilliseconds(0); // Optional: zero out ms
+                document.getElementById('game-datetime').min = now.toISOString().slice(0,16);
 
-        // --- CONFETTI LOGIC --- (No changes)
-        let confettiInterval = null; function startConfetti() { stopConfetti(); confettiContainer.innerHTML = ''; const colors = [varToString('--primary-color'), varToString('--secondary-color'), varToString('--accent-color'), '#FFFFFF']; for (let i = 0; i < 50; i++) createConfettiParticle(colors); confettiInterval = setInterval(() => { if (currentScreen !== 'end') { stopConfetti(); return; } createConfettiParticle(colors); }, 150); } function createConfettiParticle(colors) { const c=document.createElement('div');c.classList.add('confetti');c.style.left=`${Math.random()*100}vw`;c.style.backgroundColor=colors[Math.floor(Math.random()*colors.length)];c.style.animationDuration=`${Math.random()*2+3}s`;c.style.opacity=`${Math.random()*0.5+0.5}`;const s=Math.random()*0.5+0.5;c.style.transform=`scale(${s})`;c.style.width=`${10*s}px`;c.style.height=`${20*s}px`;confettiContainer.appendChild(c);c.addEventListener('animationend',()=>c.remove()); } function stopConfetti() { clearInterval(confettiInterval); confettiInterval = null; } function varToString(v) { if (document.documentElement) return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); return '#FF6B00'; }
+            } else {
+                createGameModal.classList.remove('visible');
+                createGameForm.reset(); // Reset form fields
+                createGameError.textContent = ''; // Clear errors
+            }
+        }
+        function toggleProfileEdit(editing) {
+            if (editing) {
+                 hideElement(profileUsernameDisplay); // Hide static username display
+                 hideElement(editProfileBtn); // Hide edit icon
+                 showElement(profileEditFields); // Show input fields
+                 showElement(saveProfileBtn); // Show save button
+                 editProfileUsernameInput.focus(); // Focus username input
+                 profileUpdateError.textContent = ''; // Clear messages
+                 profileUpdateMessage.textContent = '';
+            } else {
+                 showElement(profileUsernameDisplay); // Show static username display
+                 showElement(editProfileBtn); // Show edit icon
+                 hideElement(profileEditFields); // Hide input fields
+                 hideElement(saveProfileBtn); // Hide save button
+                 profileUpdateError.textContent = ''; // Clear messages on exiting edit mode too
+                 profileUpdateMessage.textContent = '';
+            }
+        }
+        function toggleChatDrawer(open) {
+            if (open) {
+                chatDrawer.classList.add('open');
+                // Update chat title based on context (e.g., game name) if needed
+                 if (currentGameData && ['detail', 'active'].includes(currentScreen)) {
+                    document.getElementById('chat-title').textContent = `${currentGameData.location_name || 'Game'} Chat`;
+                 } else {
+                    document.getElementById('chat-title').textContent = 'Chat'; // Default title
+                 }
+                scrollToChatBottom(); // Scroll on open
+            } else {
+                chatDrawer.classList.remove('open');
+            }
+        }
+        function scrollToChatBottom() {
+            // Use requestAnimationFrame for smoother scrolling after DOM updates
+            requestAnimationFrame(() => {
+                 if (chatMessages) {
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                 }
+            });
+        }
+        function showShareModal(text, url) {
+            const shareUrl = url || window.location.href; // Default to current page URL
+            const shareText = text || "Check out this game on HoopsLink!";
+            shareLinkInput.value = shareUrl; // Set input value for copying
+
+            // Web Share API check
+            if (navigator.share) {
+                 showElement(webShareApiBtn);
+                 webShareApiBtn.onclick = async () => {
+                     try {
+                         await navigator.share({
+                             title: 'HoopsLink Game', // Title for share dialog
+                             text: shareText,
+                             url: shareUrl
+                         });
+                         console.log('Content shared successfully');
+                         toggleShareModal(false); // Close modal after successful share
+                     } catch (err) {
+                          console.error('Error sharing content:', err);
+                          // Handle errors (e.g., user cancelled share) gracefully
+                          if (err.name !== 'AbortError') {
+                                alert(`Could not share: ${err.message}`);
+                          }
+                     }
+                 };
+            } else {
+                 hideElement(webShareApiBtn); // Hide if Web Share API not supported
+            }
+
+            shareModal.classList.add('visible'); // Show the modal
+        }
+        function toggleShareModal(show) {
+            if (show) {
+                shareModal.classList.add('visible');
+            } else {
+                shareModal.classList.remove('visible');
+                copyShareLinkBtn.textContent = 'Copy Link'; // Reset copy button text
+            }
+        }
+        function copyShareLink() {
+            shareLinkInput.select(); // Select the text
+            shareLinkInput.setSelectionRange(0, 99999); // For mobile devices
+
+            try {
+                 // Use modern Clipboard API if available (requires HTTPS or localhost)
+                 navigator.clipboard.writeText(shareLinkInput.value).then(() => {
+                     copyShareLinkBtn.textContent = 'Copied!';
+                     setTimeout(() => { copyShareLinkBtn.textContent = 'Copy Link'; }, 2000);
+                 }).catch(err => {
+                     console.warn('Clipboard API failed, using fallback:', err);
+                     oldCopyFallback(); // Use fallback if Clipboard API fails
+                 });
+            } catch (err) {
+                 console.warn('Clipboard API not available, using fallback:', err);
+                 oldCopyFallback(); // Use fallback if Clipboard API doesn't exist
+            }
+        }
+        function oldCopyFallback() {
+             // Deprecated fallback using execCommand
+             try {
+                 const successful = document.execCommand('copy');
+                 if (successful) {
+                     copyShareLinkBtn.textContent = 'Copied!';
+                 } else {
+                     copyShareLinkBtn.textContent = 'Copy Failed';
+                 }
+                 setTimeout(() => { copyShareLinkBtn.textContent = 'Copy Link'; }, 2000);
+             } catch (err) {
+                 console.error('Fallback copy method failed:', err);
+                 copyShareLinkBtn.textContent = 'Copy Error';
+                 setTimeout(() => { copyShareLinkBtn.textContent = 'Copy Link'; }, 2000);
+             }
+         }
+
+        // --- GAME TIMER FUNCTIONS ---
+        function startGameTimer(endTimeString) {
+            stopGameTimer(); // Clear any existing timer first
+            if (!endTimeString || !gameTimerDisplay) return; // No end time or display element
+
+            const endTime = new Date(endTimeString).getTime();
+            if (isNaN(endTime) || endTime <= Date.now()) {
+                 // End time is invalid or already passed
+                 if (endTime <= Date.now() && currentGameData?.status === 'active') {
+                    console.log("Timer started with time already expired.");
+                    gameTimerDisplay.textContent = "00:00";
+                    handleTimeExpired(); // Immediately trigger expiration logic if active
+                 } else {
+                     gameTimerDisplay.textContent = "--:--";
+                 }
+                 return;
+            }
+
+            console.log("Starting game timer, ends at:", new Date(endTimeString));
+
+            gameTimerInterval = setInterval(() => {
+                 const now = Date.now();
+                 const remainingMilliseconds = endTime - now;
+
+                 if (remainingMilliseconds <= 0) {
+                     // Time is up
+                     gameTimerDisplay.textContent = "00:00";
+                     handleTimeExpired(); // Call function to handle game end by time
+                 } else {
+                     // Update display
+                     updateTimerDisplay(remainingMilliseconds);
+                 }
+             }, 1000); // Update every second
+
+            // Initial display update
+            updateTimerDisplay(endTime - Date.now());
+        }
+        function stopGameTimer() {
+            if (gameTimerInterval) {
+                 clearInterval(gameTimerInterval);
+                 gameTimerInterval = null;
+                 console.log("Game timer stopped.");
+            }
+             // Reset display when timer stops (optional)
+            if (gameTimerDisplay) {
+                // gameTimerDisplay.textContent = "--:--";
+            }
+        }
+        function updateTimerDisplay(milliseconds) {
+            if (!gameTimerDisplay) return;
+            const totalSeconds = Math.max(0, Math.floor(milliseconds / 1000));
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            // Format as MM:SS
+            gameTimerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+        function handleTimeExpired() {
+             stopGameTimer(); // Ensure interval is cleared
+             console.log("Game time has expired!");
+
+             // Check if the game is still active before ending it
+             // Use currentGameData which should be updated by realtime
+             if (currentGameData && currentGameData.status === 'active') {
+                  console.log("Ending game due to time running out...");
+                  // The endGame function will determine the winner based on current score
+                  endGame(currentGameData);
+             } else {
+                  console.warn("Time expired, but game is not active or data unavailable. Status:", currentGameData?.status);
+             }
+         }
+
+        // --- CONFETTI LOGIC --- (No changes needed from original)
+        let confettiInterval = null; function startConfetti() { stopConfetti(); confettiContainer.innerHTML = ''; const colors = [varToString('--primary-color'), varToString('--secondary-color'), varToString('--accent-color'), '#FFFFFF']; for (let i = 0; i < 50; i++) createConfettiParticle(colors); confettiInterval = setInterval(() => { if (currentScreen !== 'end') { stopConfetti(); return; } createConfettiParticle(colors); }, 150); } function createConfettiParticle(colors) { const c=document.createElement('div');c.classList.add('confetti');c.style.left=`${Math.random()*100}vw`;c.style.backgroundColor=colors[Math.floor(Math.random()*colors.length)];c.style.animationDuration=`${Math.random()*2+3}s`;c.style.opacity=`${Math.random()*0.5+0.5}`;const s=Math.random()*0.5+0.5;c.style.transform=`scale(${s})`;c.style.width=`${10*s}px`;c.style.height=`${20*s}px`;confettiContainer.appendChild(c);c.addEventListener('animationend',()=>c.remove()); } function stopConfetti() { clearInterval(confettiInterval); confettiInterval = null; confettiContainer.innerHTML = ''; } function varToString(v) { try { if (document.documentElement) return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); } catch (e) { /* ignore error during init? */ } return '#FF6B00'; } // Default fallback
 
         // --- INITIALIZATION ---
         function initApp() {
              console.log("Initializing HoopsLink App...");
-             if (!supabase) { console.error("Supabase client needed."); hideElement(screens.loading); authError.textContent="Config error."; authTitle.textContent="Error"; disableElement(authSubmitBtn); disableElement(authToggleBtn); navigateTo('auth'); return; }
+             if (!supabase) {
+                 console.error("Supabase client failed to initialize. Application cannot start.");
+                 hideElement(screens.loading);
+                 // Show a critical error message on the auth screen maybe
+                 authTitle.textContent = "Initialization Error";
+                 authError.textContent = "Failed to connect to the database. Please refresh or contact support.";
+                 disableElement(authSubmitBtn); disableElement(authToggleBtn);
+                 navigateTo('auth'); // Show auth screen with error
+                 return;
+             }
 
-             // Event Listeners
-             authForm.addEventListener('submit', handleAuth); authToggleBtn.addEventListener('click', toggleAuthMode); logoutBtn.addEventListener('click', handleLogout); createGameFab.addEventListener('click',()=>toggleCreateGameModal(true)); createGameForm.addEventListener('submit',handleCreateGameSubmit); joinLeaveGameBtn.addEventListener('click',handleJoinLeaveClick); beginGameBtn.addEventListener('click',handleBeginGameClick); cancelGameBtn.addEventListener('click',handleCancelGameClick); shareGameBtn.addEventListener('click',()=>{if(currentGameData){const t=`Join "${currentGameData.location_name||'Game'}"!`; showShareModal(t,window.location.href);}}); activeGameContent.addEventListener('click',handleScoreClick); confirmScoreBtn.addEventListener('click',confirmScoreProposal); rejectScoreBtn.addEventListener('click',rejectScoreProposal); profileNavBtn.addEventListener('click',()=>{if(currentUser){navigateTo('profile');fetchProfileData(currentUser.id);}else{navigateTo('auth');}}); leaderboardNavBtn.addEventListener('click',()=>{navigateTo('leaderboard');fetchLeaderboard('global');}); editProfileBtn.addEventListener('click',()=>toggleProfileEdit(true)); saveProfileBtn.addEventListener('click',handleProfileUpdate); leaderboardFilters.addEventListener('click',handleLeaderboardFilterClick); backBtns.forEach(b=>b.addEventListener('click',()=>{navigateTo('main');fetchGames();})); toggleChatBtn.addEventListener('click',()=>toggleChatDrawer(true)); activeGameToggleChatBtn.addEventListener('click',()=>toggleChatDrawer(true)); closeChatBtn.addEventListener('click',()=>toggleChatDrawer(false)); sendChatBtn.addEventListener('click',handleSendChat); chatInput.addEventListener('keypress',(e)=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();handleSendChat(e);}}); copyShareLinkBtn.addEventListener('click',copyShareLink);
+             // --- EVENT LISTENERS ---
+             authForm.addEventListener('submit', handleAuth);
+             authToggleBtn.addEventListener('click', toggleAuthMode);
+             logoutBtn.addEventListener('click', handleLogout);
+             createGameFab.addEventListener('click', () => toggleCreateGameModal(true));
+             createGameForm.addEventListener('submit', handleCreateGameSubmit);
+             document.querySelector('#create-game-modal .modal-close-btn').addEventListener('click', () => toggleCreateGameModal(false)); // Close modal button
 
-             // Auth Listener (Simplified logic relying on checkUserSession)
-             supabase.auth.onAuthStateChange(async (event, session) => {
-                 console.log('Auth Event:', event, session ? 'Session User:' : 'No Session', session?.user?.id);
-                 const currentUserId = currentUser?.id;
-                 currentUser = session?.user ?? null;
-
-                 // If user just signed out, trigger handleLogout to reset UI
-                 if (event === 'SIGNED_OUT' && currentScreen !== 'auth') {
-                     console.log("Handling explicit SIGNED_OUT event.");
-                     handleLogout();
+             joinLeaveGameBtn.addEventListener('click', handleJoinLeaveClick);
+             beginGameBtn.addEventListener('click', handleBeginGameClick);
+             cancelGameBtn.addEventListener('click', handleCancelGameClick);
+             shareGameBtn.addEventListener('click', () => {
+                 if (currentGameData) {
+                    const text = `Join "${currentGameData.location_name || 'Game'}" on HoopsLink! Status: ${currentGameData.status}`;
+                    // Consider generating a unique game URL later: const url = `${window.location.origin}?game=${currentGameData.id}`;
+                    showShareModal(text, window.location.href);
                  }
-                 // If user state changed (login/logout/refresh affecting user presence)
-                 // And we are NOT currently logging out manually (to avoid double-nav)
-           
+             });
+             document.querySelector('#share-modal .modal-close-btn').addEventListener('click', () => toggleShareModal(false));
+             copyShareLinkBtn.addEventListener('click', copyShareLink);
+
+             activeGameContent.addEventListener('click', handleScoreClick); // Listener on parent for score clicks
+             confirmScoreBtn.addEventListener('click', confirmScoreProposal);
+             rejectScoreBtn.addEventListener('click', rejectScoreProposal);
+
+             profileNavBtn.addEventListener('click', () => {
+                 if (currentUser) { navigateTo('profile'); fetchProfileData(currentUser.id); }
+                 else { navigateTo('auth'); } // Redirect to login if not logged in
+             });
+             leaderboardNavBtn.addEventListener('click', () => {
+                 navigateTo('leaderboard'); fetchLeaderboard('global'); // Default to global
+             });
+             editProfileBtn.addEventListener('click', () => toggleProfileEdit(true));
+             saveProfileBtn.addEventListener('click', handleProfileUpdate); // Use click for save button too
+             // profileEditFields.addEventListener('submit', handleProfileUpdate); // If using a form for edit fields
+
+             leaderboardFilters.addEventListener('click', handleLeaderboardFilterClick); // Listener on parent
+             // Add listener for all back buttons
+             backBtns.forEach(btn => btn.addEventListener('click', handleBackButtonClick));
+
+             toggleChatBtn.addEventListener('click', () => toggleChatDrawer(true));
+             activeGameToggleChatBtn.addEventListener('click', () => toggleChatDrawer(true));
+             closeChatBtn.addEventListener('click', () => toggleChatDrawer(false));
+             sendChatBtn.addEventListener('click', handleSendChat);
+             chatInput.addEventListener('keypress', (e) => {
+                 // Send on Enter key, unless Shift+Enter is pressed (for newline)
+                 if (e.key === 'Enter' && !e.shiftKey) {
+                     e.preventDefault(); // Prevent default newline behavior
+                     handleSendChat(e);
+                 }
+             });
+
+             // Auth State Change Listener (Handles login, logout, token refresh)
+             supabase.auth.onAuthStateChange(async (event, session) => {
+                 console.log('Auth State Change Event:', event, session ? 'Session Active' : 'No Session');
+                 const previousUserId = currentUser?.id;
+                 currentUser = session?.user ?? null; // Update currentUser state
+
+                 if (event === 'SIGNED_OUT') {
+                    console.log("Handling SIGNED_OUT event via listener.");
+                     // If logout wasn't initiated by button click (e.g., token expiry), ensure clean state
+                     if (currentScreen !== 'auth') { // Avoid loop if already on auth screen
+                        handleLogout(); // Use the logout function for cleanup
+                     }
+                 } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') {
+                     // User logged in, or session refreshed
+                     if (currentUser && currentUser.id !== previousUserId) {
+                         // New user logged in or switched, check session details
+                         console.log("User signed in or session refreshed:", currentUser.id);
+                         await checkUserSession(); // Re-check session to load profile etc.
+                     } else if (currentUser && currentUser.id === previousUserId) {
+                         // Same user, session likely refreshed, maybe update profile if needed?
+                         // console.log("Session token refreshed for current user.");
+                     }
+                 } else if (event === 'USER_UPDATED') {
+                    console.log("User details updated (e.g., email change). Re-fetch profile?");
+                    if (currentUser && currentScreen === 'profile') {
+                        fetchProfileData(currentUser.id); // Refresh profile screen if open
+                    }
+                 } else {
+                    console.log("Unhandled auth event:", event);
+                 }
              });
 
              // Initial session check after listeners are set up
+             // checkUserSession is called by the INITIAL_SESSION event from onAuthStateChange
+             // But call it manually just in case the listener fires late or edge cases.
              checkUserSession();
 
         } // End initApp
