@@ -2665,12 +2665,9 @@
         const checkUserSession = async () => {
             if (!supabase) { navigateTo('auth'); hideElement(screens.loading); return; }
             try {
-                 console.log("Checking user session...");
-                 const { data: { session }, error } = await supabase.auth.getSession();
-
+                
                  if (error) {
-                     console.error("Error getting session:", error);
-                     navigateTo('auth'); // Default to auth screen on error
+               
                  } else if (session?.user) {
                      // User is logged in
                      currentUser = session.user;
