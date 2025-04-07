@@ -2662,61 +2662,83 @@
             authForm.reset(); // Clear input fields
             enableElement(authSubmitBtn); // Ensure button is enabled
         };
-        const checkUserSession = async () => {
-            if (!supabase) { navigateTo('auth'); hideElement(screens.loading); return; }
-            try {
-                
-                 if (error) {
-               
-                 } else if (session?.user) {
-                     // User is logged in
-                     currentUser = session.user;
-                     console.log("Active session found for:", currentUser.id);
+                       // --- MODIFIED checkUserSession (No longer async) ---
+        const checkUserSession = () => {
+            console.log("checkUserSession: Starting check...");
 
-                     // Attempt to load profile if not already loaded or if user ID changed
-                     if (!userProfile || userProfile.user_id !== currentUser.id) {
-                         userProfile = await getUserProfile(currentUser.id);
-                         if (!userProfile) {
-                              console.warn("User logged in, but profile data is missing or failed to load for:", currentUser.id);
-                              // Still navigate to main, but profile-dependent features might fail
-                              // Consider navigating to profile screen first?
-                              // alert("Welcome! Your profile isn't fully set up yet."); // Optional user feedback
-                              if (currentScreen === 'auth' || currentScreen === 'loading') {
-                                  navigateTo('main');
-                                  fetchGames(); // Fetch games even without full profile
-                              }
-                         } else {
-                             console.log("User profile loaded:", userProfile.username);
-                             // Navigate to main app if currently on auth/loading
-                             if (currentScreen === 'auth' || currentScreen === 'loading') {
-                                 navigateTo('main');
-                                 fetchGames();
-                             }
-                         }
-                     } else {
-                        // Profile already loaded, just ensure navigation if needed
-                         if (currentScreen === 'auth' || currentScreen === 'loading') {
-                            navigateTo('main');
-                            fetchGames();
-                         }
-                     }
-                 } else {
-                     // No active session, user is logged out
-                     console.log("No active session found.");
-                     if (currentScreen !== 'auth') { // Avoid navigating if already there
-                        handleLogout(); // Use logout function to ensure clean state reset
-                        // navigateTo('auth'); // Handled by handleLogout
-                     }
-                 }
-            } catch (err) {
-                 console.error("Exception during session check:", err);
-                 if (currentScreen !== 'auth') {
-                    navigateTo('auth'); // Fallback to auth on unexpected errors
-                 }
-            } finally {
-                 // Always hide loading screen after check completes
-                 hideElement(screens.loading);
+            // *** Hide loader immediately based on currentUser state ***
+            // This function assumes onAuthStateChange has already set 'currentUser' correctly.
+            hideElement(screens.loading);
+            console.log("checkUserSession: Loader hidden.");
+
+            if (currentUser) {
+                // User object exists (session active)
+                console.log("checkUserSession: User found:", currentUser.id);
+
+                // --- Start background loading (don't await here) ---
+                const loadUserDataInBackground = async () => {
+                    console.log("checkUserSession (async task): Starting user data load...");
+                    if (!userProfile || userProfile.user_id !== currentUser.id) {
+                        console.log("checkUserSession (async task): Loading profile...");
+                        try {
+                            // Use a timeout for profile fetching to prevent indefinite hangs? Optional.
+                            userProfile = await getUserProfile(currentUser.id); // Still await here within the async task
+                            if (userProfile) {
+                                console.log("checkUserSession (async task): Profile loaded:", userProfile.username);
+                                // If profile screen is active when data arrives, re-render it
+                                if (currentScreen === 'profile') {
+                                    renderProfile(userProfile);
+                                }
+                            } else {
+                                console.warn("checkUserSession (async task): Profile fetch returned null/empty.");
+                                // Handle case where user exists but profile is missing
+                                if (currentScreen === 'profile') {
+                                     // Show minimal info or setup prompt on profile screen
+                                     profileContent.innerHTML = `<p class="p-2 text-center">Profile setup needed. Email: ${currentUser?.email || 'N/A'}</p>`;
+                                     showElement(profileContent); hideElement(profileLoader);
+                                }
+                            }
+                        } catch (profileError) {
+                             console.error("checkUserSession (async task): Error loading profile:", profileError);
+                             userProfile = null; // Ensure profile is null on error
+                        }
+                    } else {
+                         console.log("checkUserSession (async task): Profile already cached.");
+                    }
+
+                    // Fetch games if we landed on the main screen
+                    if (currentScreen === 'main') {
+                        console.log("checkUserSession (async task): Fetching games for main screen...");
+                        fetchGames();
+                    }
+                    console.log("checkUserSession (async task): Background data load attempt finished.");
+                };
+                // Fire off the background loading task
+                loadUserDataInBackground();
+                // --- End background loading ---
+
+                // --- Handle navigation immediately (synchronously) ---
+                if (currentScreen === 'auth' || currentScreen === 'loading') {
+                    console.log("checkUserSession: Navigating to 'main' screen immediately...");
+                    navigateTo('main'); // Navigate now, data will load in background
+                    // Note: fetchGames is now called from loadUserDataInBackground *if* currentScreen is 'main'
+                } else {
+                     console.log(`checkUserSession: Already on screen '${currentScreen}', no immediate navigation needed.`);
+                }
+
+            } else {
+                // No currentUser object (no active session)
+                console.log("checkUserSession: No currentUser object. Ensuring auth screen.");
+                // Don't call handleLogout here, onAuthStateChange handles SIGNED_OUT event.
+                // Just navigate if not already on auth.
+                if (currentScreen !== 'auth') {
+                    navigateTo('auth');
+                }
+                // Reset auth form potentially?
+                authForm.reset();
+                authError.textContent = '';
             }
+            console.log("checkUserSession: Check finished.");
         };
 
         // --- EVENT HANDLERS ---
@@ -3130,41 +3152,43 @@
              });
 
              // Auth State Change Listener (Handles login, logout, token refresh)
-             supabase.auth.onAuthStateChange(async (event, session) => {
-                 console.log('Auth State Change Event:', event, session ? 'Session Active' : 'No Session');
-                 const previousUserId = currentUser?.id;
-                 currentUser = session?.user ?? null; // Update currentUser state
+                            supabase.auth.onAuthStateChange(async (event, session) => { // Listener itself can remain async if needed elsewhere
+            console.log(`onAuthStateChange: Event: ${event}, Session: ${session ? `Active (User: ${session.user?.id})` : 'None'}`);
+            const previousUserId = currentUser?.id;
+            currentUser = session?.user ?? null; // Update global currentUser state
 
-                 if (event === 'SIGNED_OUT') {
-                    console.log("Handling SIGNED_OUT event via listener.");
-                     // If logout wasn't initiated by button click (e.g., token expiry), ensure clean state
-                     if (currentScreen !== 'auth') { // Avoid loop if already on auth screen
-                        handleLogout(); // Use the logout function for cleanup
-                     }
-                 } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') {
-                     // User logged in, or session refreshed
-                     if (currentUser && currentUser.id !== previousUserId) {
-                         // New user logged in or switched, check session details
-                         console.log("User signed in or session refreshed:", currentUser.id);
-                         await checkUserSession(); // Re-check session to load profile etc.
-                     } else if (currentUser && currentUser.id === previousUserId) {
-                         // Same user, session likely refreshed, maybe update profile if needed?
-                         // console.log("Session token refreshed for current user.");
-                     }
-                 } else if (event === 'USER_UPDATED') {
-                    console.log("User details updated (e.g., email change). Re-fetch profile?");
-                    if (currentUser && currentScreen === 'profile') {
-                        fetchProfileData(currentUser.id); // Refresh profile screen if open
+            switch (event) {
+                case 'INITIAL_SESSION':
+                case 'SIGNED_IN': // Treat initial session and sign-in similarly for this logic
+                    console.log(`onAuthStateChange: ${event} detected. Calling checkUserSession.`);
+                    // Call the SYNCHRONOUS checkUserSession. It hides the loader immediately.
+                    checkUserSession();
+                    // No need to await, and no need to hide loader here (it's done inside checkUserSession)
+                    break;
+
+                // ... Keep other cases (SIGNED_OUT, TOKEN_REFRESHED, etc.) as they were ...
+
+                case 'SIGNED_OUT':
+                    console.log("onAuthStateChange: SIGNED_OUT detected.");
+                    if (currentScreen !== 'auth') {
+                        handleLogout(); // Use the full logout procedure which also navigates and hides loader
+                    } else {
+                         // Already on auth screen, ensure loader is hidden if somehow visible
+                         hideElement(screens.loading);
+                         authForm.reset();
+                         authError.textContent = '';
                     }
-                 } else {
-                    console.log("Unhandled auth event:", event);
-                 }
-             });
+                    break;
+
+                // ... rest of the switch cases ...
+
+            }
+        });
 
              // Initial session check after listeners are set up
              // checkUserSession is called by the INITIAL_SESSION event from onAuthStateChange
              // But call it manually just in case the listener fires late or edge cases.
-             checkUserSession();
+            // checkUserSession();
 
         } // End initApp
 
