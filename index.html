@@ -1356,14 +1356,7 @@
                  }
                  // If user state changed (login/logout/refresh affecting user presence)
                  // And we are NOT currently logging out manually (to avoid double-nav)
-                 else if (currentUser?.id !== currentUserId) {
-                     console.log("User state potentially changed, re-checking session & profile...");
-                     await checkUserSession(); // Re-verify session and profile state
-                 } else if (event === 'USER_UPDATED') {
-                      console.log("User updated in Supabase Auth, refetching profile.");
-                      if(currentUser) userProfile = await getUserProfile(currentUser.id);
-                      if(currentScreen === 'profile') renderProfile(userProfile);
-                 }
+           
              });
 
              // Initial session check after listeners are set up
